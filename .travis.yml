@@ -9,3 +9,4 @@ env:
   - SWIFT_VERSION=swift-3.0-PREVIEW-4
 script:
   - swift build
+  - swift test
