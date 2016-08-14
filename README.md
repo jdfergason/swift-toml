@@ -12,8 +12,8 @@ For full details of writing TOML files see the [TOML documentation](https://gith
 
 TOML files are parsed using one of two functions:
 
-1) Read TOML from file
-2) Parse TOML from string
+1. Read TOML from file
+2. Parse TOML from string
 
 Both functions return a Toml object of parsed key/value pairs
 
