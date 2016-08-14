@@ -58,13 +58,19 @@ Add the project to  to your Package.swift file as a dependency:
         .Package(url: "http://github.com/jdfergason/swift-toml", majorVersion: 1)
     ]
 
+## Compatibility
+
+SwiftToml is compatible with Swift 3.0.
+
+It has been tested with SWIFT-3.0-PREVIEW-4 on Mac OS X, Ubuntu 14.04, and Fedora 23.  Currently it only works with Mac OS X due to some features of Swift not currently working under linux.  I am actively working to fully support linux.
+
 ## Tests
 
 To run the unit tests checkout the repository and type:
 
     swift test
 
-NOTE: this must be done from the root of the checkout because it depends on a variety of test data files
+Note: this must be done from the root of the checkout because it depends on a variety of test data files
 that are referenced as a relative path.
 
 ## License
