@@ -58,11 +58,12 @@ Add the project to  to your Package.swift file as a dependency:
 
 ## Tests
 
-To run the unit tests checkout the repository and type (NOTE: this must be done
-from the root of the checkout because it depends on a variety of test data files
-that are referenced as a relative path.)
+To run the unit tests checkout the repository and type:
 
     swift test
+
+NOTE: this must be done from the root of the checkout because it depends on a variety of test data files
+that are referenced as a relative path.
 
 ## License
 
