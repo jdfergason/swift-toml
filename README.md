@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jdfergason/swift-toml.svg?branch=master)](https://travis-ci.org/jdfergason/swift-toml)
+
 # SwiftToml
 
 SwiftToml is a TOML parser written in the swift language.  TOML is an intuitive
