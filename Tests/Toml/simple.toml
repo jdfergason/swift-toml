@@ -1,0 +1,8 @@
+string="value"
+literal_string='lite\ral'
+int=1
+float=3.14
+date=1982-07-27T12:00:00Z
+array=[1,2,3]
+inline_table={1="one", 3="three"}
+bool=true
