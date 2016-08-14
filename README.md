@@ -12,8 +12,8 @@ For full details of writing TOML files see the [TOML documentation](https://gith
 
 TOML files are parsed using one of two functions:
 
-1) Read TOML from file
-2) Parse TOML from string
+1. Read TOML from file
+2. Parse TOML from string
 
 Both functions return a Toml object of parsed key/value pairs
 
@@ -58,11 +58,12 @@ Add the project to  to your Package.swift file as a dependency:
 
 ## Tests
 
-To run the unit tests checkout the repository and type (NOTE: this must be done
-from the root of the checkout because it depends on a variety of test data files
-that are referenced as a relative path.)
+To run the unit tests checkout the repository and type:
 
     swift test
+
+NOTE: this must be done from the root of the checkout because it depends on a variety of test data files
+that are referenced as a relative path.
 
 ## License
 
