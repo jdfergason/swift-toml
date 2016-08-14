@@ -26,7 +26,7 @@ extension String {
         let regex = try! NSRegularExpression(pattern: "\\\\(\\s+)",
             options: [.dotMatchesLineSeparators])
         let matches = regex.matches(in: s, options: [],
-            xrange: NSMakeRange(0, s.utf16.count))
+            range: NSMakeRange(0, s.utf16.count))
         let nss = (s as NSString)
 
         for match in matches {
