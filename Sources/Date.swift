@@ -42,23 +42,22 @@ extension Date {
     // rfc3339 w fractional seconds w/ time offset
     init?(rfc3339String: String, fractionalSeconds: Bool = true, localTime: Bool = false) {
         var dateStr = rfc3339String
+        var dateFormatter: DateFormatter
 
         if localTime {
             dateStr += localTimeOffset()
         }
 
         if fractionalSeconds {
-            if let d = rfc3339fractionalformatter.date(from: dateStr) {
-                self.init(timeInterval: 0, since: d)
-            } else {
-                return nil
-            }
+            dateFormatter = rfc3339fractionalformatter
         } else {
-            if let d = rfc3339formatter.date(from: dateStr) {
-                self.init(timeInterval: 0, since: d)
-            } else {
-                return nil
-            }
+            dateFormatter = rfc3339formatter
+        }
+
+        if let d = dateFormatter.date(from: dateStr) {
+            self.init(timeInterval: 0, since: d)
+        } else {
+            return nil
         }
     }
 }
