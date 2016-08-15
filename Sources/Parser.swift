@@ -63,7 +63,7 @@ public extension Toml {
 
     private func parse(string: String) throws {
         // Convert input into tokens
-        let lexer = Lexer(input: string)
+        let lexer = Lexer(input: string, grammar: Grammar().grammar)
         let tokens = try lexer.tokenize()
         try parse(tokens: tokens)
     }
@@ -108,83 +108,44 @@ public extension Toml {
         - Returns: Array populated with values from token stream
     */
     private func parse(tokens: inout [Token]) throws -> [Any] {
-        var arr: [Any] = [Any]()
+        var array: [Any] = [Any]()
 
         while tokens.count > 0 {
             let token = tokens.remove(at: 0)
-            switch(token) {
+            switch token {
                 case .Identifier(let val):
-                    arr.append(val)
+                    array.append(val)
                 case .IntegerNumber(let val):
-                    arr.append(val)
+                    array.append(val)
                 case .DoubleNumber(let val):
-                    arr.append(val)
+                    array.append(val)
                 case .Boolean(let val):
-                    arr.append(val)
+                    array.append(val)
                 case .DateTime(let val):
-                    arr.append(val)
+                    array.append(val)
                 case .InlineTableBegin:
-                    var tableTokens = [Token]()
-                    while tokens.count > 0 {
-                        let tableToken = tokens.remove(at: 0)
-                        if case .InlineTableEnd = tableToken {
-                            break
-                        }
-                        tableTokens.append(tableToken)
-                    }
-                    let t = try Toml(tokens: tableTokens)
-                    arr.append(t)
+                    array.append(try processInlineTable(tokens: &tokens))
                 case .ArrayBegin:
-                    let otherArr = try parse(tokens: &tokens)
-
-                    // allow empty arrays
-                    if otherArr.count == 0 {
-                        arr.append(otherArr)
-                        continue
-                    }
-
-                    // convert array to proper type
-                    switch otherArr[0] {
-                        case is Int:
-                            if let typedArr = otherArr as? [Int] {
-                                arr.append(typedArr)
-                            } else {
-                                throw TomlError.MixedArrayType("Int")
-                            }
-                        case is Double:
-                            if let typedArr = otherArr as? [Double] {
-                                arr.append(typedArr)
-                            } else {
-                                throw TomlError.MixedArrayType("Double")
-                            }
-                        case is String:
-                            if let typedArr = otherArr as? [String] {
-                                arr.append(typedArr)
-                            } else {
-                                throw TomlError.MixedArrayType("String")
-                            }
-                        case is Bool:
-                            if let typedArr = otherArr as? [Bool] {
-                                arr.append(typedArr)
-                            } else {
-                                throw TomlError.MixedArrayType("Bool")
-                            }
-                        case is Date:
-                            if let typedArr = otherArr as? [Date] {
-                                arr.append(typedArr)
-                            } else {
-                                throw TomlError.MixedArrayType("Date")
-                            }
-                        default:
-                            // array of arrays leave as any
-                            arr.append(otherArr)
-                    }
+                    try checkAndSetArray(check: parse(tokens: &tokens), out: &array)
                 default:
-                    return arr
+                    return array
             }
         }
 
-        return arr
+        return array
+    }
+
+    private func processInlineTable(tokens: inout [Token]) throws -> Toml {
+        var tableTokens = [Token]()
+        while tokens.count > 0 {
+            let tableToken = tokens.remove(at: 0)
+            if case .InlineTableEnd = tableToken {
+                break
+            }
+            tableTokens.append(tableToken)
+        }
+        let t = try Toml(tokens: tableTokens)
+        return t
     }
 
     /**
@@ -250,7 +211,7 @@ public extension Toml {
                 break
             } else if case .TableSep = subToken {
                 if emptyTableSep {
-                    throw TomlError.SyntaxError("Must not have empty implicit tables, this is likely caused by an un-quoted .. in the table name")
+                    throw TomlError.SyntaxError("Must not have un-named implicit tables")
                 }
                 emptyTableSep = true
             } else if case .Identifier(let val) = subToken {

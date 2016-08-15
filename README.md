@@ -7,7 +7,7 @@ SwiftToml is a TOML parser written in the swift language.  TOML is an intuitive
 configuration file format that is designed to be easy for humans to read and
 computers to parse.
 
-SwiftToml currently parses files that conform to version 0.4 of the TOML spec. 
+SwiftToml currently parses files that conform to version 0.4 of the TOML spec.
 
 For full details of writing TOML files see the [TOML documentation](https://github.com/toml-lang/toml).
 

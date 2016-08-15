@@ -17,21 +17,21 @@
 import Foundation
 
 private var rfc3339fractionalformatter: DateFormatter = {
-  let formatter = DateFormatter()
-  formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSSSSZZZZZ"
-  formatter.timeZone = TimeZone(secondsFromGMT: 0)
-  formatter.calendar = Calendar(identifier: .iso8601)
-  formatter.locale = Locale(identifier: "en_US_POSIX")
-  return formatter
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSSSSZZZZZ"
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.calendar = Calendar(identifier: .iso8601)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    return formatter
 }()
 
 private var rfc3339formatter: DateFormatter = {
-  let formatter = DateFormatter()
-  formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ"
-  formatter.timeZone = TimeZone(secondsFromGMT: 0)
-  formatter.calendar = Calendar(identifier: .iso8601)
-  formatter.locale = Locale(identifier: "en_US_POSIX")
-  return formatter
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ"
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.calendar = Calendar(identifier: .iso8601)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    return formatter
 }()
 
 private func localTimeOffset() -> String {
@@ -42,40 +42,26 @@ private func localTimeOffset() -> String {
  }
 
 extension Date {
-  // rfc3339 w fractional seconds w/ time offset
-  init?(rfc3339FractionalSecondsFormattedString: String) {
-    if let d = rfc3339fractionalformatter.date(from: rfc3339FractionalSecondsFormattedString) {
-      self.init(timeInterval: 0, since: d)
-    } else {
-      return nil
-    }
-  }
+    // rfc3339 w fractional seconds w/ time offset
+    init?(rfc3339String: String, fractionalSeconds: Bool = true, localTime: Bool = false) {
+        var dateStr = rfc3339String
 
-  // rfc3339 w fractional seconds w/o time offset
-  init?(rfc3339LocalFractionalSecondsFormattedString: String) {
-    if let d = rfc3339fractionalformatter.date(
-      from: rfc3339LocalFractionalSecondsFormattedString + localTimeOffset()) {
-      self.init(timeInterval: 0, since: d)
-    } else {
-      return nil
-    }
-  }
+        if localTime {
+            dateStr += localTimeOffset()
+        }
 
-  // rfc3339 w/o fractional seconds w/ time offset
-  init?(rfc3339FormattedString: String) {
-    if let d = rfc3339formatter.date(from: rfc3339FormattedString) {
-      self.init(timeInterval: 0, since: d)
-    } else {
-      return nil
+        if fractionalSeconds {
+            if let d = rfc3339fractionalformatter.date(from: dateStr) {
+                self.init(timeInterval: 0, since: d)
+            } else {
+                return nil
+            }
+        } else {
+            if let d = rfc3339formatter.date(from: dateStr) {
+                self.init(timeInterval: 0, since: d)
+            } else {
+                return nil
+            }
+        }
     }
-  }
-
-  // rfc3339 w/o fractional seconds w/o time offset
-  init?(rfc3339LocalFormattedString: String) {
-    if let d = rfc3339formatter.date(from: rfc3339LocalFormattedString + localTimeOffset()) {
-      self.init(timeInterval: 0, since: d)
-    } else {
-      return nil
-    }
-  }
 }
