@@ -165,3 +165,32 @@ func getTableTokens(keyPath: [String], tokens: inout [Token]) -> [Token] {
 
     return tableTokens
 }
+
+func extractTableTokens(tokens: inout [Token], inline: Bool = false) -> [Token] {
+    var tableTokens = [Token]()
+    while tokens.count > 0 {
+        let tableToken = tokens[0]
+
+        if inline {
+            tokens.remove(at: 0)
+        }
+
+        if case .InlineTableEnd = tableToken {
+            if inline {
+                break
+            }
+        } else if case .TableBegin = tableToken {
+            break
+        } else if case .TableArrayBegin = tableToken {
+            break
+        }
+
+        if !inline {
+            tokens.remove(at: 0)
+        }
+
+        tableTokens.append(tableToken)
+    }
+
+    return tableTokens
+}

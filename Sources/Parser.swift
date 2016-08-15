@@ -109,15 +109,7 @@ class Parser {
     }
 
     private func processInlineTable(tokens: inout [Token]) throws -> Toml {
-        var tableTokens = [Token]()
-        while tokens.count > 0 {
-            let tableToken = tokens.remove(at: 0)
-            if case .InlineTableEnd = tableToken {
-                break
-            }
-            tableTokens.append(tableToken)
-        }
-
+        let tableTokens = extractTableTokens(tokens: &tokens, inline: true)
         let tableParser = Parser()
         try tableParser.parse(tokens: tableTokens)
         return tableParser.toml
@@ -165,19 +157,7 @@ class Parser {
                 }
 
                 toml.setTable(key: keyPath)
-
-                var tableTokens = [Token]()
-                while tokens.count > 0 {
-                    let tableToken = tokens[0]
-                    if case .TableBegin = tableToken {
-                        break
-                    } else if case .TableArrayBegin = tableToken {
-                        break
-                    }
-                    tokens.remove(at: 0)
-                    tableTokens.append(tableToken)
-                }
-
+                let tableTokens = extractTableTokens(tokens: &tokens)
                 try parse(tokens: tableTokens)
                 tableExists = true
                 break
@@ -238,16 +218,9 @@ class Parser {
     private func setInlineTable(currToken: Token, tokens: inout [Token]) throws {
         keyPath.append(currentKey)
 
-        var tableTokens = [Token]()
-        while tokens.count > 0 {
-            let tableToken = tokens.remove(at: 0)
-            if case .InlineTableEnd = tableToken {
-                break
-            }
-            tableTokens.append(tableToken)
-        }
-
+        let tableTokens = extractTableTokens(tokens: &tokens, inline: true)
         try parse(tokens: tableTokens)
+
         // This was an inline table so remove from keyPath
         keyPath.removeLast()
     }

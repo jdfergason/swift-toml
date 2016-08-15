@@ -16,6 +16,54 @@
 
 import Foundation
 
+func getUnicodeChar(unicode: String) throws -> String {
+    // check if it's a valid character
+    let code = Int(strtoul(unicode, nil, 16))
+
+    if code < 0x0 || (code > 0xD7FF && code < 0xE000) || code > 0x10FFFF {
+        throw TomlError.InvalidUnicodeCharacter(code)
+    }
+
+    return String(UnicodeScalar(code))
+}
+
+func checkEscape(char: Character, escape: inout Bool) throws -> (String, Int) {
+    var unicodeSize = -1
+    var s: String = ""
+
+    switch char {
+        case "n":
+            s = "\n"
+            escape = false
+        case "\\":
+            s = "\\"
+            escape = false
+        case "\"":
+            s = "\""
+            escape = false
+        case "f":
+            s = "\u{000C}"
+            escape = false
+        case "b":
+            s = "\u{0008}"
+            escape = false
+        case "t":
+            s = "\t"
+            escape = false
+        case "r":
+            s = "\r"
+            escape = false
+        case "u":
+            unicodeSize = 4
+        case "U":
+            unicodeSize = 8
+        default:
+            throw TomlError.InvalidEscapeSequence("\\" + String(char))
+    }
+
+    return (s, unicodeSize)
+}
+
 extension String {
     func trim() -> String {
         return self.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
@@ -46,52 +94,19 @@ extension String {
         for char in self.characters {
             if escape {
                 if unicodeSize == 0 {
-                    // check if it's a valid character
-                    let code = Int(strtoul(unicode, nil, 16))
+                    s += try getUnicodeChar(unicode: unicode)
+                    s += String(char)
 
-                    if code < 0x0 || (code > 0xD7FF && code < 0xE000) || code > 0x10FFFF {
-                        throw TomlError.InvalidUnicodeCharacter(code)
-                    }
-
-                    s += String(UnicodeScalar(code))
                     escape = false
                     unicodeSize = -1
                     unicode = ""
-
-                    s += String(char)
                 } else if unicodeSize > 0 {
                     unicodeSize -= 1
                     unicode += String(char)
                 } else {
-                    switch char {
-                        case "n":
-                            s += "\n"
-                            escape = false
-                        case "\\":
-                            s += "\\"
-                            escape = false
-                        case "\"":
-                            s += "\""
-                            escape = false
-                        case "f":
-                            s += "\u{000C}"
-                            escape = false
-                        case "b":
-                            s += "\u{0008}"
-                            escape = false
-                        case "t":
-                            s += "\t"
-                            escape = false
-                        case "r":
-                            s += "\r"
-                            escape = false
-                        case "u":
-                            unicodeSize = 4
-                        case "U":
-                            unicodeSize = 8
-                        default:
-                            throw TomlError.InvalidEscapeSequence("\\" + String(char))
-                    }
+                    let (newChar, size) = try checkEscape(char: char, escape: &escape)
+                    s += newChar
+                    unicodeSize = size
                 }
             } else if char == "\\" {
                 escape = true
@@ -101,14 +116,7 @@ extension String {
         }
 
         if unicodeSize == 0 {
-            // check if it's a valid character
-            let code = Int(strtoul(unicode, nil, 16))
-
-            if code < 0x0 || (code > 0xD7FF && code < 0xE000) || code > 0x10FFFF {
-                throw TomlError.InvalidUnicodeCharacter(code)
-            }
-
-            s += String(UnicodeScalar(code))
+            s += try getUnicodeChar(unicode: unicode)
         }
 
         return s

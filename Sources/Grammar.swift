@@ -258,47 +258,9 @@ class Grammar {
         ] + valueEvaluators()
     }
 
-    private func inlineTableEvaluators() -> [Evaluator] {
+    private func stringKeyEvaluator() -> [Evaluator] {
         let validUnicodeChars = "\\u0020-\\u0021\\u0023-\\u005B\\u005D-\\uFFFF"
         return [
-            // Ignore white-space and commas
-            Evaluator(regex: "[ \t,]", generator: { _ in nil }),
-
-            // inline-table
-            Evaluator(regex: "\\{", generator: { _ in .InlineTableBegin }, push: ["inlineTable"]),
-            Evaluator(regex: "\\}", generator: { _ in .InlineTableEnd }, pop: true),
-
-            // detect key-value
-            Evaluator(regex: "[a-zA-Z0-9_-]+[ \t]*=",
-                generator: {
-                    (r: String) in
-                        .Key(r.substring(to: r.index(r.endIndex, offsetBy:-1)).trim())
-                },
-                push: ["value"]),
-           // string key
-            Evaluator(regex: "\"([" + validUnicodeChars + "]|\\\\\"|\\\\)+\"[ \t]*=",
-                generator: {
-                    (r: String) in
-                        .Key(try trimStringIdentifier(r, "\"").replaceEscapeSequences())
-                },
-                push: ["value"]),
-            // literal string key
-            Evaluator(regex: "'([\\u0020-\\u0026\\u0028-\\uFFFF])+'[ \t]*=",
-                generator: { (r: String) in .Key(trimStringIdentifier(r, "'")) },
-                push: ["value"]),
-        ]
-    }
-
-    private func rootEvaluators() -> [Evaluator] {
-        let validUnicodeChars = "\\u0020-\\u0021\\u0023-\\u005B\\u005D-\\uFFFF"
-        return [
-            // Ignore white-space
-            Evaluator(regex: "[ \t\r\n]", generator: { _ in nil }),
-
-            // Comments
-            Evaluator(regex: "#", generator: { _ in nil }, push: ["comment"]),
-
-            // Key / Value
             // bare key
             Evaluator(regex: "[a-zA-Z0-9_-]+[ \t]*=",
                 generator: {
@@ -317,10 +279,28 @@ class Grammar {
             Evaluator(regex: "'([\\u0020-\\u0026\\u0028-\\uFFFF])+'[ \t]*=",
                 generator: { (r: String) in .Key(trimStringIdentifier(r, "'")) },
                 push: ["value"]),
+        ]
+    }
 
+    private func inlineTableEvaluators() -> [Evaluator] {
+        return [
+            // Ignore white-space and commas
+            Evaluator(regex: "[ \t,]", generator: { _ in nil }),
+            // inline-table
+            Evaluator(regex: "\\{", generator: { _ in .InlineTableBegin }, push: ["inlineTable"]),
+            Evaluator(regex: "\\}", generator: { _ in .InlineTableEnd }, pop: true),
+        ] + stringKeyEvaluator()
+    }
+
+    private func rootEvaluators() -> [Evaluator] {
+        return [
+            // Ignore white-space
+            Evaluator(regex: "[ \t\r\n]", generator: { _ in nil }),
+            // Comments
+            Evaluator(regex: "#", generator: { _ in nil }, push: ["comment"]),
+        ] + stringKeyEvaluator() + [
             // Array of tables (must come before table)
             Evaluator(regex: "\\[\\[", generator: { _ in .TableArrayBegin }, push: ["tableArray"]),
-
             // Tables
             Evaluator(regex: "\\[", generator: { _ in .TableBegin }, push: ["tableName"]),
         ]
