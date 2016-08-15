@@ -16,18 +16,30 @@
 
 import Foundation
 
+class ArrayWrapper: SetValueProtocol {
+    var array: [Any]
+
+    init(array: [Any]) {
+        self.array = array
+    }
+
+    public func setValue(key: [String], value: Any) {
+        array.append(value)
+    }
+}
+
 /**
     Utility function to cast an array to a given type or throw an error
 
     - Parameter array: Input array to cast to type T
     - Parameter out: Array to store result in
 
-    - Throws: `TomlError.MixedArrayType` if array cannot be casted to appropriate type
+    - Throws: `TomlError.MixedArrayType` if array cannot be cast to appropriate type
 */
-func checkAndSetArray(check: [Any], out: inout [Any]) throws {
+func checkAndSetArray<T: SetValueProtocol>(check: [Any], key: [String], out: inout T) throws {
     // allow empty arrays
     if check.count == 0 {
-        out.append(check)
+        out.setValue(key: key, value: check)
         return
     }
 
@@ -35,37 +47,37 @@ func checkAndSetArray(check: [Any], out: inout [Any]) throws {
     switch check[0] {
         case is Int:
             if let typedArray = check as? [Int] {
-                out.append(typedArray)
+                out.setValue(key: key, value: typedArray)
             } else {
                 throw TomlError.MixedArrayType("Int")
             }
         case is Double:
             if let typedArray = check as? [Double] {
-                out.append(typedArray)
+                out.setValue(key: key, value: typedArray)
             } else {
                 throw TomlError.MixedArrayType("Double")
             }
         case is String:
             if let typedArray = check as? [String] {
-                out.append(typedArray)
+                out.setValue(key: key, value: typedArray)
             } else {
                 throw TomlError.MixedArrayType("String")
             }
         case is Bool:
             if let typedArray = check as? [Bool] {
-                out.append(typedArray)
+                out.setValue(key: key, value: typedArray)
             } else {
                 throw TomlError.MixedArrayType("Bool")
             }
         case is Date:
             if let typedArray = check as? [Date] {
-                out.append(typedArray)
+                out.setValue(key: key, value: typedArray)
             } else {
                 throw TomlError.MixedArrayType("Date")
             }
         default:
             // array of arrays leave as any
-            out.append(check)
+            out.setValue(key: key, value: check)
     }
 }
 
@@ -79,4 +91,77 @@ func trimStringIdentifier(_ input: String, _ quote: String = "\"") -> String {
         range: NSMakeRange(0, input.utf16.count))
     let nss = (input as NSString)
     return nss.substring(with: matches[0].rangeAt(1))
+}
+
+func getKeyPathFromTable(tokens: [Token]) -> [String] {
+    var subKeyPath = [String]()
+    subKeyPathLoop: for token in tokens {
+        switch token {
+            case .Identifier(let val):
+                subKeyPath.append(val)
+            case .TableSep, .TableArrayBegin, .TableBegin:
+                continue
+            default:
+                break subKeyPathLoop
+        }
+    }
+
+    return subKeyPath
+}
+
+func consumeTableIdentifierTokens(tableTokens: inout [Token], tokens: inout [Token]) {
+    while tokens.count > 0 {
+        let nestedToken = tokens[0]
+        tableTokens.append(nestedToken)
+        tokens.remove(at: 0)
+        if case .TableEnd = nestedToken {
+            break
+        } else if case .TableArrayEnd = nestedToken {
+            break
+        }
+    }
+}
+
+func getTableTokens(keyPath: [String], tokens: inout [Token]) -> [Token] {
+    var tableTokens = [Token]()
+    nestedTableLoop: while tokens.count > 0 {
+        let tableToken = tokens[0]
+
+        // need to include sub tables
+        switch tableToken {
+            case .TableBegin, .TableArrayBegin:
+                // get the key path of the new table
+                let subKeyPath = getKeyPathFromTable(tokens: tokens)
+
+                // If the new table is nested within the current one
+                // include it, otherwise we are finished.
+                if subKeyPath.count == 1 {
+                    // top-level - break
+                    break nestedTableLoop
+                }
+
+                if subKeyPath[0] != keyPath[0] {
+                    // nested table but not part of this table group
+                    break nestedTableLoop
+                }
+
+                // this table should be included because it's a
+                // nested table
+
+                // .TableBegin || .TableArrayBegin
+                tokens.remove(at: 0)
+                tableTokens.append(tableToken)
+
+                // skip first name
+                tokens.remove(at: 0) // Identifier
+                tokens.remove(at: 0) // .TableSep
+
+                consumeTableIdentifierTokens(tableTokens: &tableTokens, tokens: &tokens)
+            default:
+                tokens.remove(at: 0)
+                tableTokens.append(tableToken)
+        }
+    }
+
+    return tableTokens
 }

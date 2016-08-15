@@ -18,50 +18,21 @@ import Foundation
 
 // MARK: Parse
 
-public extension Toml {
+class Parser {
+    var keyPath: [String] = []
+    var currentKey: String = "."
+    var toml: Toml = Toml()
 
-    // MARK: Public API
+    // MARK: Initializers
 
-    /**
-        Read the specified TOML file from disk.
-
-        - Parameter contentsOfFile: Path of file to read
-        - Parameter encoding: Encoding of file
-
-        - Throws: `TomlError.SyntaxError` if the file is invalid
-        - Throws: `NSError` if the file does not exist
-
-        - Returns: A dictionary with parsed results
-    */
-    public convenience init(contentsOfFile path: String,
-        encoding: String.Encoding = String.Encoding.utf8) throws {
+    convenience init(toml: Toml) {
         self.init()
-        let source = try String(contentsOfFile: path, encoding: encoding)
-        try parse(string: source)
+        self.toml = toml
     }
 
-    /**
-        Parse the string `withString` as TOML.
+    // MARK: Parsing
 
-        - Parameter withString: A string with TOML document
-
-        - Throws: `TomlError.SyntaxError` if the file is invalid
-
-        - Returns: A dictionary with parsed results
-    */
-    public convenience init(withString string: String) throws {
-        self.init()
-        try parse(string: string)
-    }
-
-    // MARK: Private
-
-    private convenience init(tokens: [Token]) throws {
-        self.init()
-        try parse(tokens: tokens)
-    }
-
-    private func parse(string: String) throws {
+    public func parse(string: String) throws {
         // Convert input into tokens
         let lexer = Lexer(input: string, grammar: Grammar().grammar)
         let tokens = try lexer.tokenize()
@@ -126,7 +97,9 @@ public extension Toml {
                 case .InlineTableBegin:
                     array.append(try processInlineTable(tokens: &tokens))
                 case .ArrayBegin:
-                    try checkAndSetArray(check: parse(tokens: &tokens), out: &array)
+                    var wrap = ArrayWrapper(array: array)
+                    try checkAndSetArray(check: parse(tokens: &tokens), key: [""], out: &wrap)
+                    array = wrap.array
                 default:
                     return array
             }
@@ -144,8 +117,10 @@ public extension Toml {
             }
             tableTokens.append(tableToken)
         }
-        let t = try Toml(tokens: tableTokens)
-        return t
+
+        let tableParser = Parser()
+        try tableParser.parse(tokens: tableTokens)
+        return tableParser.toml
     }
 
     /**
@@ -157,14 +132,12 @@ public extension Toml {
     private func setValue(currToken: Token, tokens: inout [Token]) throws {
         var key = keyPath
         key.append(currentKey)
-        let hash = String(key)
-        let keyExists = data[hash] != nil
 
-        if keyExists {
-            throw TomlError.DuplicateKey(hash)
+        if toml.hasKey(key) {
+            throw TomlError.DuplicateKey(String(key))
         }
 
-        data[hash] = currToken.value
+        toml.setValue(key: key, value: currToken.value)
     }
 
     /**
@@ -187,12 +160,11 @@ public extension Toml {
                     throw TomlError.SyntaxError("Table name must not be blank")
                 }
 
-                let keyExists = data[String(keyPath)] != nil
-                if keyExists || tables.contains(String(keyPath)) {
+                if toml.hasKey(keyPath) || toml.hasTable(keyPath) {
                     throw TomlError.DuplicateKey(String(keyPath))
                 }
 
-                tables.append(String(keyPath))
+                toml.setTable(key: keyPath)
 
                 var tableTokens = [Token]()
                 while tokens.count > 0 {
@@ -236,72 +208,18 @@ public extension Toml {
                     throw TomlError.SyntaxError("Table array name must not be blank")
                 }
 
-                var tableTokens = [Token]()
-                nestedTableLoop: while tokens.count > 0 {
-                    let tableToken = tokens[0]
+                let tableTokens = getTableTokens(keyPath: keyPath, tokens: &tokens)
 
-                    // need to include sub tables
-                    switch tableToken {
-                        case .TableBegin, .TableArrayBegin:
-                            // get the key path of the new table
-                            var subKeyPath = [String]()
-                            subKeyPathLoop: for token in tokens {
-                                switch token {
-                                    case .Identifier(let val):
-                                        subKeyPath.append(val)
-                                    case .TableSep, .TableArrayBegin, .TableBegin:
-                                        continue
-                                    default:
-                                        break subKeyPathLoop
-                                }
-                            }
-
-                            // If the new table is nested within the current one
-                            // include it, otherwise we are finished.
-                            if subKeyPath.count == 1 {
-                                // top-level - break
-                                break nestedTableLoop
-                            }
-
-                            if subKeyPath[0] != keyPath[0] {
-                                // nested table but not part of this table group
-                                break nestedTableLoop
-                            }
-
-                            // this table should be included because it's a
-                            // nested table
-
-                            // .TableBegin || .TableArrayBegin
-                            tokens.remove(at: 0)
-                            tableTokens.append(tableToken)
-
-                            // skip first name
-                            tokens.remove(at: 0) // Identifier
-                            tokens.remove(at: 0) // .TableSep
-
-                            while tokens.count > 0 {
-                                let nestedToken = tokens[0]
-                                tableTokens.append(nestedToken)
-                                tokens.remove(at: 0)
-                                if case .TableEnd = nestedToken {
-                                    break
-                                } else if case .TableArrayEnd = nestedToken {
-                                    break
-                                }
-                            }
-
-                        default:
-                            tokens.remove(at: 0)
-                            tableTokens.append(tableToken)
-                    }
-                }
-
-                if let _ = data[String(keyPath)] {
-                    var arr = data[String(keyPath)] as! [Toml]
-                    arr.append(try Toml(tokens: tableTokens))
-                    data[String(keyPath)] = arr
+                if toml.hasKey(keyPath) {
+                    var arr: [Toml] = try toml.arrayWithPath(keyPath: keyPath)
+                    let tableParser = Parser()
+                    try tableParser.parse(tokens: tableTokens)
+                    arr.append(tableParser.toml)
+                    toml.setValue(key: keyPath, value: arr)
                 } else {
-                    data[String(keyPath)] = [try Toml(tokens: tableTokens)]
+                    let tableParser = Parser()
+                    try tableParser.parse(tokens: tableTokens)
+                    toml.setValue(key: keyPath, value: [tableParser.toml])
                 }
                 break tableLoop
             } else if case .Identifier(let val) = subToken {
@@ -345,49 +263,13 @@ public extension Toml {
 
         var myKeyPath = keyPath
         myKeyPath.append(currentKey)
-        let key = String(myKeyPath)
 
         // allow empty arrays
         if arr.count == 0 {
-            data[key] = arr
+            toml.setValue(key: myKeyPath, value: arr)
             return
         }
 
-        // if not empty; convert array to proper type
-        switch arr[0] {
-            case is Int:
-                if let typedArr = arr as? [Int] {
-                    data[key] = typedArr
-                } else {
-                    throw TomlError.MixedArrayType("Int")
-                }
-            case is Double:
-                if let typedArr = arr as? [Double] {
-                    data[key] = typedArr
-                } else {
-                    throw TomlError.MixedArrayType("Double")
-                }
-            case is String:
-                if let typedArr = arr as? [String] {
-                    data[key] = typedArr
-                } else {
-                    throw TomlError.MixedArrayType("String")
-                }
-            case is Bool:
-                if let typedArr = arr as? [Bool] {
-                    data[key] = typedArr
-                } else {
-                    throw TomlError.MixedArrayType("Bool")
-                }
-            case is Date:
-                if let typedArr = arr as? [Date] {
-                    data[key] = typedArr
-                } else {
-                    throw TomlError.MixedArrayType("Date")
-                }
-            default:
-                // array of arrays leave as any
-                data[key] = arr
-        }
+        try checkAndSetArray(check: arr, key: myKeyPath, out: &toml)
     }
 }
