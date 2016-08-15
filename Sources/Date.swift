@@ -16,23 +16,20 @@
 
 import Foundation
 
-private var rfc3339fractionalformatter: DateFormatter = {
+private func buildDateFormatter(format: String) -> DateFormatter {
     let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSSSSZZZZZ"
+    formatter.dateFormat = format
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
     formatter.calendar = Calendar(identifier: .iso8601)
     formatter.locale = Locale(identifier: "en_US_POSIX")
     return formatter
-}()
+}
 
-private var rfc3339formatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ"
-    formatter.timeZone = TimeZone(secondsFromGMT: 0)
-    formatter.calendar = Calendar(identifier: .iso8601)
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    return formatter
-}()
+private var rfc3339fractionalformatter =
+    buildDateFormatter(format: "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSSSSZZZZZ")
+
+private var rfc3339formatter: DateFormatter =
+    buildDateFormatter(format: "yyyy'-'MM'-'dd'T'HH':'mm':'ssZZZZZ")
 
 private func localTimeOffset() -> String {
     let totalSeconds: Int = TimeZone.current.secondsFromGMT()
