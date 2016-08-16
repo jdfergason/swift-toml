@@ -116,7 +116,7 @@ class Parser {
     }
 
     /**
-        Given a value token set it's value in the `table`
+        Given a value token set its value in the `table`
 
         - Parameter currToken: A value token that is currently being parsed
         - Parameter tokens: Array of remaining tokens in the stream
