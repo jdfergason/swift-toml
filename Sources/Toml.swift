@@ -166,12 +166,12 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: An array of type [T]
     */
-    public func arrayWithPath<T>(keyPath: [String]) throws -> [T] {
-        if let val = data[String(describing: keyPath)] {
+    public func array<T>(_ path: [String]) throws -> [T] {
+        if let val = data[String(describing: path)] {
             return val as! [T]
         }
 
-        throw TomlError.KeyError(String(describing: keyPath))
+        throw TomlError.KeyError(String(describing: path))
     }
 
     /**
@@ -185,11 +185,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: An array of type [T]
     */
     public func array<T>(_ path: String...) throws -> [T] {
-        if let val = data[String(describing: path)] {
-            return val as! [T]
-        }
-
-        throw TomlError.KeyError(String(describing: path))
+        return try array(path)
     }
 
     /**

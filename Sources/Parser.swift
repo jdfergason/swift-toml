@@ -191,7 +191,7 @@ class Parser {
                 let tableTokens = getTableTokens(keyPath: keyPath, tokens: &tokens)
 
                 if toml.hasKey(keyPath) {
-                    var arr: [Toml] = try toml.arrayWithPath(keyPath: keyPath)
+                    var arr: [Toml] = try toml.array(keyPath)
                     let tableParser = Parser()
                     try tableParser.parse(tokens: tableTokens)
                     arr.append(tableParser.toml)
