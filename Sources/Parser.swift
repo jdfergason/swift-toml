@@ -126,7 +126,7 @@ class Parser {
         key.append(currentKey)
 
         if toml.hasKey(key) {
-            throw TomlError.DuplicateKey(String(key))
+            throw TomlError.DuplicateKey(String(describing: key))
         }
 
         toml.setValue(key: key, value: currToken.value)
@@ -153,7 +153,7 @@ class Parser {
                 }
 
                 if toml.hasKey(keyPath) || toml.hasTable(keyPath) {
-                    throw TomlError.DuplicateKey(String(keyPath))
+                    throw TomlError.DuplicateKey(String(describing: keyPath))
                 }
 
                 toml.setTable(key: keyPath)

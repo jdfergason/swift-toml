@@ -98,7 +98,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter value: Value to set
     */
     public func setValue(key: [String], value: Any) {
-        data[String(key)] = value
+        data[String(describing: key)] = value
     }
 
     /**
@@ -108,7 +108,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter value: Table to set
     */
     public func setTable(key: [String]) {
-        tables.append(String(key))
+        tables.append(String(describing: key))
     }
 
     /**
@@ -119,7 +119,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if key exists; false otherwise
     */
     public func hasKey(_ key: [String]) -> Bool {
-        let keyExists = data[String(key)] != nil
+        let keyExists = data[String(describing: key)] != nil
         return keyExists
     }
 
@@ -142,7 +142,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if table exists; false otherwise
     */
     public func hasTable(_ key: [String]) -> Bool {
-        return tables.contains(String(key))
+        return tables.contains(String(describing: key))
     }
 
     /**
@@ -167,11 +167,11 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: An array of type [T]
     */
     public func arrayWithPath<T>(keyPath: [String]) throws -> [T] {
-        if let val = data[String(keyPath)] {
+        if let val = data[String(describing: keyPath)] {
             return val as! [T]
         }
 
-        throw TomlError.KeyError(String(keyPath))
+        throw TomlError.KeyError(String(describing: keyPath))
     }
 
     /**
@@ -185,11 +185,11 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: An array of type [T]
     */
     public func array<T>(_ path: String...) throws -> [T] {
-        if let val = data[String(path)] {
+        if let val = data[String(describing: path)] {
             return val as! [T]
         }
 
-        throw TomlError.KeyError(String(path))
+        throw TomlError.KeyError(String(describing: path))
     }
 
     /**
@@ -319,11 +319,11 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     }
 
     private func value<T>(_ path: [String]) throws -> T {
-        if let val = data[String(path)] {
+        if let val = data[String(describing: path)] {
             return val as! T
         }
 
-        throw TomlError.KeyError(String(path))
+        throw TomlError.KeyError(String(describing: path))
     }
 
     /**
@@ -332,6 +332,6 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: String version of TOML document
     */
     public var description: String {
-        return "\(String(data))"
+        return "\(String(describing: data))"
     }
 }

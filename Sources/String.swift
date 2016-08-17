@@ -24,7 +24,7 @@ func getUnicodeChar(unicode: String) throws -> String {
         throw TomlError.InvalidUnicodeCharacter(code)
     }
 
-    return String(UnicodeScalar(code))
+    return String(describing: UnicodeScalar(code)!)
 }
 
 func checkEscape(char: Character, escape: inout Bool) throws -> (String, Int) {
@@ -58,7 +58,7 @@ func checkEscape(char: Character, escape: inout Bool) throws -> (String, Int) {
         case "U":
             unicodeSize = 8
         default:
-            throw TomlError.InvalidEscapeSequence("\\" + String(char))
+            throw TomlError.InvalidEscapeSequence("\\" + String(describing: char))
     }
 
     return (s, unicodeSize)
@@ -95,14 +95,14 @@ extension String {
             if escape {
                 if unicodeSize == 0 {
                     s += try getUnicodeChar(unicode: unicode)
-                    s += String(char)
+                    s += String(describing: char)
 
                     escape = false
                     unicodeSize = -1
                     unicode = ""
                 } else if unicodeSize > 0 {
                     unicodeSize -= 1
-                    unicode += String(char)
+                    unicode += String(describing: char)
                 } else {
                     let (newChar, size) = try checkEscape(char: char, escape: &escape)
                     s += newChar
@@ -111,7 +111,7 @@ extension String {
             } else if char == "\\" {
                 escape = true
             } else {
-                s += String(char)
+                s += String(describing: char)
             }
         }
 
