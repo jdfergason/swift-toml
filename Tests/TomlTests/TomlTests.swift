@@ -40,7 +40,7 @@ class TomlTests: XCTestCase {
 
     func testImplicitlyDefinedTable() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
-        XCTAssertTrue(try actual.hasTable("table2"))
+        XCTAssertTrue(actual.hasTable("table2"))
     }
 
     func testNestedTables() {

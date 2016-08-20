@@ -184,13 +184,13 @@ class Grammar {
     }
 
     private func doubleValueEvaluators() -> [Evaluator] {
+        let generator: TokenGenerator = { (val: String) in .DoubleNumber(Double(val)!) }
         return [
             // Double values with exponent
             Evaluator(regex: "[-\\+]?[0-9]+(\\.[0-9]+)?[eE][-\\+]?[0-9]+",
-                generator: { (r: String) in .DoubleNumber(Double(r)!) }, pop:true),
+                generator: generator, pop:true),
             // Double values no exponent
-            Evaluator(regex: "[-\\+]?[0-9]+\\.[0-9]+",
-                generator: { (r: String) in .DoubleNumber(Double(r)!) }, pop: true),
+            Evaluator(regex: "[-\\+]?[0-9]+\\.[0-9]+", generator: generator, pop: true),
         ]
     }
 
