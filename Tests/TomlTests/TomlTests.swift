@@ -38,6 +38,11 @@ class TomlTests: XCTestCase {
         XCTAssertThrowsError(try actual.string("non-existant.key"))
     }
 
+    func testImplicitlyDefinedTable() {
+        let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
+        XCTAssertTrue(try actual.hasTable("table2"))
+    }
+
     func testNestedTables() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
         // All tables
@@ -626,6 +631,7 @@ class TomlTests: XCTestCase {
             ("testKeyError", testKeyError),
             // ("testDateFormat", testDateFormat), // see comment on function
             ("testNestedTables", testNestedTables),
+            ("testImplicitlyDefinedTable", testImplicitlyDefinedTable),
             // failed tests
             ("testParseErrorExample1", testParseErrorExample1),
             ("testParseErrorExample2", testParseErrorExample2),
