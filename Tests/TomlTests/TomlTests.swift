@@ -77,6 +77,17 @@ class TomlTests: XCTestCase {
         XCTAssertEqual(String(describing: expectedTables), String(describing: actualTables))
     }
 
+    func testDateFormat() {
+        let actual = try! Toml(contentsOfFile: "Tests/TomlTests/date-format.toml")
+        XCTAssertEqual(try actual.date("date1"), Date(rfc3339String: "1979-05-27T07:32:00.0Z")!)
+        XCTAssertEqual(try actual.date("date2"), Date(rfc3339String: "1979-05-27T07:32:00.5Z")!)
+        XCTAssertEqual(try actual.date("date3"), Date(rfc3339String: "1979-05-27T00:32:00.6-07:00")!)
+        XCTAssertEqual(try actual.date("date4"), Date(rfc3339String: "1979-05-27T00:32:00.999999+07:00")!)
+        XCTAssertEqual(try actual.date("date5"), Date(rfc3339String: "1979-05-27T07:32:00.0", localTime: true)!)
+        XCTAssertEqual(try actual.date("date6"), Date(rfc3339String: "1979-05-27T07:32:00.5", localTime: true)!)
+        XCTAssertEqual(try actual.date("date7"), Date(rfc3339String: "1979-05-27T00:00:00.0", localTime: true)!)
+    }
+
     // Tests from TOML repo
 
     func testTomlExample() {
@@ -611,6 +622,7 @@ class TomlTests: XCTestCase {
         return [
             ("testSimple", testSimple),
             ("testKeyError", testKeyError),
+            ("testDateFormat", testDateFormat),
             ("testNestedTables", testNestedTables),
             // failed tests
             ("testParseErrorExample1", testParseErrorExample1),
