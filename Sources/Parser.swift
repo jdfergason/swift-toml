@@ -21,6 +21,7 @@ import Foundation
 class Parser {
     var keyPath: [String] = []
     var currentKey = "."
+    var declaredTables = Set<String>()
     var toml: Toml = Toml()
 
     // MARK: Initializers
@@ -152,11 +153,12 @@ class Parser {
                     throw TomlError.SyntaxError("Table name must not be blank")
                 }
 
-                if toml.hasKey(keyPath) || toml.hasTable(keyPath) {
+                let keyPathStr = String(describing: keyPath)
+                if toml.hasKey(keyPath) || declaredTables.contains(keyPathStr) {
                     throw TomlError.DuplicateKey(String(describing: keyPath))
                 }
 
-                toml.setTable(key: keyPath)
+                declaredTables.insert(keyPathStr)
                 let tableTokens = extractTableTokens(tokens: &tokens)
                 try parse(tokens: tableTokens)
                 tableExists = true
@@ -169,6 +171,7 @@ class Parser {
             } else if case .Identifier(let val) = subToken {
                 emptyTableSep = false
                 keyPath.append(val)
+                toml.setTable(key: keyPath)
             }
         }
 
