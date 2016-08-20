@@ -38,6 +38,45 @@ class TomlTests: XCTestCase {
         XCTAssertThrowsError(try actual.string("non-existant.key"))
     }
 
+    func testNestedTables() {
+        let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
+        // All tables
+        var expectedKeys = ["table1", "table2"]
+        var expectedTables = ["[\"[\\\"sub\\\", \\\"yes\\\"]\": Optional(3.1400000000000001)]",
+            "[\"[\\\"sub2\\\", \\\"hello\\\"]\": Optional(true), " +
+            "\"[\\\"sub\\\", \\\"safety\\\"]\": Optional(\"gravel\"), " +
+            "\"[\\\"key\\\"]\": Optional(\"yes\")]"]
+        var actualKeys: [String] = []
+        var actualTables: [String] = []
+        for (key, table) in try! actual.tables() {
+            actualKeys.append(key)
+            actualTables.append(String(describing: table))
+        }
+        expectedKeys.sort()
+        actualKeys.sort()
+        XCTAssertEqual(String(describing: expectedKeys), String(describing: actualKeys))
+        expectedTables.sort()
+        actualTables.sort()
+        XCTAssertEqual(String(describing: expectedTables), String(describing: actualTables))
+
+        // Only everything under table1
+        expectedKeys = ["table1.sub", "table1.sub2"]
+        actualKeys = []
+        expectedTables = ["[\"[\\\"hello\\\"]\": Optional(true)]",
+            "[\"[\\\"safety\\\"]\": Optional(\"gravel\")]"]
+        actualTables = []
+        for (key, table) in try! actual.tables("table1") {
+            actualKeys.append(key)
+            actualTables.append(String(describing: table))
+        }
+        expectedKeys.sort()
+        actualKeys.sort()
+        XCTAssertEqual(String(describing: expectedKeys), String(describing: actualKeys))
+        expectedTables.sort()
+        actualTables.sort()
+        XCTAssertEqual(String(describing: expectedTables), String(describing: actualTables))
+    }
+
     // Tests from TOML repo
 
     func testTomlExample() {
@@ -572,6 +611,7 @@ class TomlTests: XCTestCase {
         return [
             ("testSimple", testSimple),
             ("testKeyError", testKeyError),
+            ("testNestedTables", testNestedTables),
             // failed tests
             ("testParseErrorExample1", testParseErrorExample1),
             ("testParseErrorExample2", testParseErrorExample2),

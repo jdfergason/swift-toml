@@ -38,7 +38,7 @@ public enum TomlError: Error {
 }
 
 protocol SetValueProtocol {
-    func setValue(key: [String], value: Any)
+    mutating func setValue(key: [String], value: Any)
 }
 
 /**
@@ -46,7 +46,8 @@ protocol SetValueProtocol {
 */
 public class Toml: CustomStringConvertible, SetValueProtocol {
     private var data: [String: Any] = [String: Any]()
-    private var tables = [String]()
+    private var tableNames = Set<[String]>()
+    private var keyNames = Set<[String]>()
 
     /**
         Read the specified TOML file from disk.
@@ -98,17 +99,18 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter value: Value to set
     */
     public func setValue(key: [String], value: Any) {
-        data[String(describing: key)] = value
+        let path = String(describing: key)
+        keyNames.insert(key)
+        data[path] = value
     }
 
     /**
         Add a sub-table
 
-        - Parameter key: Array of strings
-        - Parameter value: Table to set
+        - Parameter key: Array of strings indicating table path
     */
     public func setTable(key: [String]) {
-        tables.append(String(describing: key))
+        tableNames.insert(key)
     }
 
     /**
@@ -142,7 +144,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if table exists; false otherwise
     */
     public func hasTable(_ key: [String]) -> Bool {
-        return tables.contains(String(describing: key))
+        let tableNamesLookup = tableNames.map({ String(describing: $0) })
+        return tableNamesLookup.contains(String(describing: key))
     }
 
     /**
@@ -284,6 +287,65 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     */
     public func string(_ path: String...) throws -> String {
         return try value(path)
+    }
+
+    /**
+        Get a dictionary of all tables 1-level down from the given key
+        path.  To get all tables at the root level call with no parameters.
+
+        - Parameter parent: Root key path
+
+        - Throws: `TomlError.KeyError` if the requested key path does not exist
+
+        - Returns: Dictionary of key names and tables
+    */
+    public func tables(_ parent: String...) throws -> [String: Toml] {
+        var result = [String: Toml]()
+        for tableName in tableNames {
+            var tableParent = tableName
+            tableParent.removeLast()
+            if parent == tableParent {
+                // this is a table to include
+                result[tableName.join(with: ".")] = try table(from: tableName)
+            }
+        }
+        return result
+    }
+
+    /**
+        Return a TOML table that contains everything beneath the specified
+        path.
+
+        - Parameter from: Key path to create table from
+
+        - Throws: `TomlError.KeyError` if the requested key path does not exist
+
+        - Returns: `Toml` table of all keys beneath the specified path
+    */
+    public func table(from path: [String]) throws -> Toml {
+        let constructedTable = Toml()
+
+        // add values
+        for keyName in keyNames {
+            var keyArray = keyName
+            if keyArray.begins(with: path) {
+                keyArray.removeSubrange(0..<path.count)
+                constructedTable.setValue(key: keyArray, value: try self.value(keyName))
+            }
+        }
+
+        // add tables
+        for tableName in tableNames {
+            var tableArray = tableName
+            if tableArray.begins(with: path) {
+                tableArray.removeSubrange(0..<path.count)
+                if tableArray.count != 0 {
+                    constructedTable.setTable(key: tableArray)
+                }
+            }
+        }
+
+        return constructedTable
     }
 
     /**

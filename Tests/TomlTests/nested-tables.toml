@@ -1,0 +1,11 @@
+[table1]
+key = "yes"
+
+[table1.sub]
+safety = "gravel"
+
+[table1.sub2]
+hello = true
+
+[table2.sub]
+yes = 3.14
