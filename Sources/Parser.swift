@@ -20,7 +20,7 @@ import Foundation
 
 class Parser {
     var keyPath: [String] = []
-    var currentKey: String = "."
+    var currentKey = "."
     var toml: Toml = Toml()
 
     // MARK: Initializers
