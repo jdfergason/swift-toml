@@ -121,7 +121,7 @@ class Grammar {
                     if let date = Date(rfc3339String: r) {
                         return Token.DateTime(date)
                     } else {
-                        throw TomlError.InvalidDateFormat(r)
+                        throw TomlError.InvalidDateFormat("####-##-##T##:##:##:##.###+/-##:## (\(r))")
                     }
             }, pop: true),
             // RFC 3339 w/o fractional seconds and time offset
@@ -130,7 +130,7 @@ class Grammar {
                     if let date = Date(rfc3339String: r, fractionalSeconds: false) {
                         return Token.DateTime(date)
                     } else {
-                        throw TomlError.InvalidDateFormat(r)
+                        throw TomlError.InvalidDateFormat("####-##-##T##:##:##:##+/-##:## (\(r))")
                     }
             }, pop: true),
             // Dates, RFC 3339 w/ fractional seconds and w/o time offset
@@ -138,7 +138,7 @@ class Grammar {
                 if let date = Date(rfc3339String: r, localTime: true) {
                     return Token.DateTime(date)
                 } else {
-                    throw TomlError.InvalidDateFormat(r)
+                    throw TomlError.InvalidDateFormat("####-##-##T##:##:##:##.### (\(r))")
                 }
             }, pop: true),
             // Dates, RFC 3339 w/o fractional seconds and w/o time offset
@@ -146,7 +146,7 @@ class Grammar {
                 if let date = Date(rfc3339String: r, fractionalSeconds: false, localTime: true) {
                     return Token.DateTime(date)
                 } else {
-                    throw TomlError.InvalidDateFormat(r)
+                    throw TomlError.InvalidDateFormat("####-##-##T##:##:##:## (\(r))")
                 }
             }, pop: true),
             // Date only
@@ -154,7 +154,7 @@ class Grammar {
                 if let date = Date(rfc3339String: r + "T00:00:00.0", localTime: true) {
                     return Token.DateTime(date)
                 } else {
-                    throw TomlError.InvalidDateFormat(r)
+                    throw TomlError.InvalidDateFormat("####-##-## (\(r))")
                 }
             }, pop: true)
         ]
