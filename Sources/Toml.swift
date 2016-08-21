@@ -306,7 +306,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             tableParent.removeLast()
             if parent == tableParent {
                 // this is a table to include
-                result[tableName.join(with: ".")] = try table(from: tableName)
+                result[tableName.map(quoted).joined(separator: ".")] = try table(from: tableName)
             }
         }
         return result

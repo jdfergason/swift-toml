@@ -133,19 +133,3 @@ func quoted(_ value: String) -> String {
 
     return value
 }
-
-extension Array where Element: CustomStringConvertible {
-    func join(with joinBy: String) -> String {
-        if self.count == 0 {
-            return ""
-        }
-
-        var result = quoted(self[0].description)
-        for string in self.dropFirst() {
-            let escapedString = quoted(string.description)
-            result += joinBy + escapedString
-        }
-
-        return result
-    }
-}
