@@ -20,22 +20,17 @@ import XCTest
 class TomlTests: XCTestCase {
     func testSimple() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/simple.toml")
-        XCTAssertEqual(try actual.string("string"), "value")
-        XCTAssertEqual(try actual.string("literal_string"), "lite\\ral")
-        XCTAssertEqual(try actual.int("int"), 1)
-        XCTAssertEqual(try actual.float("float"), 3.14)
-        XCTAssertEqual(try actual.bool("bool"), true)
-        XCTAssertEqual(try actual.date("date"), Date(rfc3339String: "1982-07-27T12:00:00.0Z"))
-        XCTAssertEqual(try actual.string("inline_table", "1"), "one")
-        XCTAssertEqual(try actual.string("inline_table", "3"), "three")
+        XCTAssertEqual(actual.string("string"), "value")
+        XCTAssertEqual(actual.string("literal_string"), "lite\\ral")
+        XCTAssertEqual(actual.int("int"), 1)
+        XCTAssertEqual(actual.float("float"), 3.14)
+        XCTAssertEqual(actual.bool("bool"), true)
+        XCTAssertEqual(actual.date("date"), Date(rfc3339String: "1982-07-27T12:00:00.0Z"))
+        XCTAssertEqual(actual.string("inline_table", "1"), "one")
+        XCTAssertEqual(actual.string("inline_table", "3"), "three")
 
-        let actual_array: [Int] = try! actual.array("array")
+        let actual_array: [Int] = actual.array("array")!
         XCTAssertEqual(actual_array, [1, 2, 3])
-    }
-
-    func testKeyError() {
-        let actual = try! Toml(contentsOfFile: "Tests/TomlTests/simple.toml")
-        XCTAssertThrowsError(try actual.string("non-existant.key"))
     }
 
     func testImplicitlyDefinedTable() {
@@ -53,7 +48,7 @@ class TomlTests: XCTestCase {
             "\"[\\\"key\\\"]\": Optional(\"yes\")]"]
         var actualKeys: [String] = []
         var actualTables: [String] = []
-        for (key, table) in try! actual.tables() {
+        for (key, table) in actual.tables() {
             actualKeys.append(key)
             actualTables.append(String(describing: table))
         }
@@ -70,7 +65,7 @@ class TomlTests: XCTestCase {
         expectedTables = ["[\"[\\\"hello\\\"]\": Optional(true)]",
             "[\"[\\\"safety\\\"]\": Optional(\"gravel\")]"]
         actualTables = []
-        for (key, table) in try! actual.tables("table1") {
+        for (key, table) in actual.tables("table1") {
             actualKeys.append(key)
             actualTables.append(String(describing: table))
         }
@@ -85,13 +80,13 @@ class TomlTests: XCTestCase {
     /* This test fails in TravisCI for some reason ... it passes on my local machine; disable until we figure out what's going on.
     func testDateFormat() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/date-format.toml")
-        XCTAssertEqual(try actual.date("date1"), Date(rfc3339String: "1979-05-27T07:32:00.0Z")!)
-        XCTAssertEqual(try actual.date("date2"), Date(rfc3339String: "1979-05-27T07:32:00.5Z")!)
-        XCTAssertEqual(try actual.date("date3"), Date(rfc3339String: "1979-05-27T00:32:00.6-07:00")!)
-        XCTAssertEqual(try actual.date("date4"), Date(rfc3339String: "1979-05-27T00:32:00.999999+07:00")!)
-        XCTAssertEqual(try actual.date("date5"), Date(rfc3339String: "1979-05-27T07:32:00.0", localTime: true)!)
-        XCTAssertEqual(try actual.date("date6"), Date(rfc3339String: "1979-05-27T07:32:00.5", localTime: true)!)
-        XCTAssertEqual(try actual.date("date7"), Date(rfc3339String: "1979-05-27T00:00:00.0", localTime: true)!)
+        XCTAssertEqual(actual.date("date1"), Date(rfc3339String: "1979-05-27T07:32:00.0Z")!)
+        XCTAssertEqual(actual.date("date2"), Date(rfc3339String: "1979-05-27T07:32:00.5Z")!)
+        XCTAssertEqual(actual.date("date3"), Date(rfc3339String: "1979-05-27T00:32:00.6-07:00")!)
+        XCTAssertEqual(actual.date("date4"), Date(rfc3339String: "1979-05-27T00:32:00.999999+07:00")!)
+        XCTAssertEqual(actual.date("date5"), Date(rfc3339String: "1979-05-27T07:32:00.0", localTime: true)!)
+        XCTAssertEqual(actual.date("date6"), Date(rfc3339String: "1979-05-27T07:32:00.5", localTime: true)!)
+        XCTAssertEqual(actual.date("date7"), Date(rfc3339String: "1979-05-27T00:00:00.0", localTime: true)!)
     }
     */
 
@@ -101,68 +96,68 @@ class TomlTests: XCTestCase {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/toml-example.toml")
 
         // owner
-        XCTAssertEqual(try actual.string("owner", "name"), "Tom Preston-Werner")
-        XCTAssertEqual(try actual.string("owner", "organization"), "GitHub")
-        XCTAssertEqual(try actual.string("owner", "bio"), "GitHub Cofounder & CEO\nLikes tater tots and beer.")
-        XCTAssertEqual(try actual.date("owner", "dob"), Date(rfc3339String: "1979-05-27T07:32:00.0Z"))
+        XCTAssertEqual(actual.string("owner", "name"), "Tom Preston-Werner")
+        XCTAssertEqual(actual.string("owner", "organization"), "GitHub")
+        XCTAssertEqual(actual.string("owner", "bio"), "GitHub Cofounder & CEO\nLikes tater tots and beer.")
+        XCTAssertEqual(actual.date("owner", "dob"), Date(rfc3339String: "1979-05-27T07:32:00.0Z"))
 
         // database
-        XCTAssertEqual(try actual.string("database", "server"), "192.168.1.1")
-        let ports: [Int] = try! actual.array("database", "ports")
+        XCTAssertEqual(actual.string("database", "server"), "192.168.1.1")
+        let ports: [Int] = actual.array("database", "ports")!
         XCTAssertEqual(ports, [8001, 8001, 8002])
-        XCTAssertEqual(try actual.int("database", "connection_max"), 5000)
-        XCTAssertEqual(try actual.bool("database", "enabled"), true)
+        XCTAssertEqual(actual.int("database", "connection_max"), 5000)
+        XCTAssertEqual(actual.bool("database", "enabled"), true)
 
         // servers.alpha
-        XCTAssertEqual(try actual.string("servers", "alpha", "ip"), "10.0.0.1")
-        XCTAssertEqual(try actual.string("servers", "alpha", "dc"), "eqdc10")
+        XCTAssertEqual(actual.string("servers", "alpha", "ip"), "10.0.0.1")
+        XCTAssertEqual(actual.string("servers", "alpha", "dc"), "eqdc10")
 
         // servers.beta
-        XCTAssertEqual(try actual.string("servers", "beta", "ip"), "10.0.0.2")
-        XCTAssertEqual(try actual.string("servers", "beta", "dc"), "eqdc10")
-        XCTAssertEqual(try actual.string("servers", "beta", "country"), "中国")
+        XCTAssertEqual(actual.string("servers", "beta", "ip"), "10.0.0.2")
+        XCTAssertEqual(actual.string("servers", "beta", "dc"), "eqdc10")
+        XCTAssertEqual(actual.string("servers", "beta", "country"), "中国")
 
         // clients
-        let data: [Any] = try! actual.array("clients", "data")
+        let data: [Any] = actual.array("clients", "data")!
         XCTAssertEqual(data[0] as! [String], ["gamma", "delta"])
         XCTAssertEqual(data[1] as! [Int], [1, 2])
-        let hosts: [String] = try! actual.array("clients", "hosts")
+        let hosts: [String] = actual.array("clients", "hosts")!
         XCTAssertEqual(hosts, ["alpha", "omega"])
 
         // products array
-        let products: [Toml] = try! actual.array("products")
-        XCTAssertEqual(try products[0].string("name"), "Hammer")
-        XCTAssertEqual(try products[0].int("sku"), 738594937)
-        XCTAssertEqual(try products[1].string("name"), "Nail")
-        XCTAssertEqual(try products[1].int("sku"), 284758393)
-        XCTAssertEqual(try products[1].string("color"), "gray")
+        let products: [Toml] = actual.array("products")!
+        XCTAssertEqual(products[0].string("name"), "Hammer")
+        XCTAssertEqual(products[0].int("sku"), 738594937)
+        XCTAssertEqual(products[1].string("name"), "Nail")
+        XCTAssertEqual(products[1].int("sku"), 284758393)
+        XCTAssertEqual(products[1].string("color"), "gray")
     }
 
     func testHardExample() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/hard_example.toml")
-        XCTAssertEqual(try actual.string("the", "test_string"), "You'll hate me after this - #")
-        let test_array: [String] = try! actual.array("the", "hard", "test_array")
+        XCTAssertEqual(actual.string("the", "test_string"), "You'll hate me after this - #")
+        let test_array: [String] = actual.array("the", "hard", "test_array")!
         XCTAssertEqual(test_array, ["] ", " # "])
-        let test_array2: [String] = try! actual.array("the", "hard", "test_array2")
+        let test_array2: [String] = actual.array("the", "hard", "test_array2")!
         XCTAssertEqual(test_array2, ["Test #11 ]proved that", "Experiment #9 was a success"])
-        XCTAssertEqual(try actual.string("the", "hard", "another_test_string"), " Same thing, but with a string #")
-        XCTAssertEqual(try actual.string("the", "hard", "harder_test_string"), " And when \"'s are in the string, along with # \"")
-        XCTAssertEqual(try actual.string("the", "hard", "bit#", "what?"), "You don't think some user won't do that?")
-        let multi_line_array: [String] = try! actual.array("the", "hard", "bit#", "multi_line_array")
+        XCTAssertEqual(actual.string("the", "hard", "another_test_string"), " Same thing, but with a string #")
+        XCTAssertEqual(actual.string("the", "hard", "harder_test_string"), " And when \"'s are in the string, along with # \"")
+        XCTAssertEqual(actual.string("the", "hard", "bit#", "what?"), "You don't think some user won't do that?")
+        let multi_line_array: [String] = actual.array("the", "hard", "bit#", "multi_line_array")!
         XCTAssertEqual(multi_line_array, ["]"])
     }
 
     func testHardExampleUnicode() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/hard_example_unicode.toml")
-        XCTAssertEqual(try actual.string("the", "test_string"), "Ýôú'ℓℓ λáƭè ₥è áƒƭèř ƭλïƨ - #")
-        let test_array: [String] = try! actual.array("the", "hard", "test_array")
+        XCTAssertEqual(actual.string("the", "test_string"), "Ýôú'ℓℓ λáƭè ₥è áƒƭèř ƭλïƨ - #")
+        let test_array: [String] = actual.array("the", "hard", "test_array")!
         XCTAssertEqual(test_array, ["] ", " # "])
-        let test_array2: [String] = try! actual.array("the", "hard", "test_array2")
+        let test_array2: [String] = actual.array("the", "hard", "test_array2")!
         XCTAssertEqual(test_array2, ["Tèƨƭ #11 ]ƥřôƲèδ ƭλáƭ", "Éжƥèřï₥èñƭ #9 ωáƨ á ƨúççèƨƨ"])
-        XCTAssertEqual(try actual.string("the", "hard", "another_test_string"), "§á₥è ƭλïñϱ, βúƭ ωïƭλ á ƨƭřïñϱ #")
-        XCTAssertEqual(try actual.string("the", "hard", "harder_test_string"), " Âñδ ωλèñ \"'ƨ ářè ïñ ƭλè ƨƭřïñϱ, áℓôñϱ ωïƭλ # \"")
-        XCTAssertEqual(try actual.string("the", "hard", "βïƭ#", "ωλáƭ?"), "Ýôú δôñ'ƭ ƭλïñƙ ƨô₥è úƨèř ωôñ'ƭ δô ƭλáƭ?")
-        let multi_line_array: [String] = try! actual.array("the", "hard", "βïƭ#", "multi_line_array")
+        XCTAssertEqual(actual.string("the", "hard", "another_test_string"), "§á₥è ƭλïñϱ, βúƭ ωïƭλ á ƨƭřïñϱ #")
+        XCTAssertEqual(actual.string("the", "hard", "harder_test_string"), " Âñδ ωλèñ \"'ƨ ářè ïñ ƭλè ƨƭřïñϱ, áℓôñϱ ωïƭλ # \"")
+        XCTAssertEqual(actual.string("the", "hard", "βïƭ#", "ωλáƭ?"), "Ýôú δôñ'ƭ ƭλïñƙ ƨô₥è úƨèř ωôñ'ƭ δô ƭλáƭ?")
+        let multi_line_array: [String] = actual.array("the", "hard", "βïƭ#", "multi_line_array")!
         XCTAssertEqual(multi_line_array, ["]"])
     }
 
@@ -172,7 +167,7 @@ class TomlTests: XCTestCase {
         // thevoid = [[[[[]]]]]
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/array-empty.toml")
         // there should be 5 sub-arrays
-        let arr0: [Any] = try! actual.array("thevoid")
+        let arr0: [Any] = actual.array("thevoid")!
         let arr1: [Any] = arr0[0] as! [Any]
         let arr2: [Any] = arr1[0] as! [Any]
         let arr3: [Any] = arr2[0] as! [Any]
@@ -184,14 +179,14 @@ class TomlTests: XCTestCase {
     func testArrayNospaces() {
         // ints = [1,2,3]
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/array-nospaces.toml")
-        let arr: [Int] = try! actual.array("ints")
+        let arr: [Int] = actual.array("ints")!
         XCTAssertEqual(arr, [1,2,3])
     }
 
     func testArraysHetergeneous() {
         // mixed = [[1, 2], ["a", "b"], [1.1, 2.1]]
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/arrays-hetergeneous.toml")
-        let arr: [Any] = try! actual.array("mixed")
+        let arr: [Any] = actual.array("mixed")!
         let arr0: [Int] = arr[0] as! [Int]
         let arr1: [String] = arr[1] as! [String]
         let arr2: [Double] = arr[2] as! [Double]
@@ -204,7 +199,7 @@ class TomlTests: XCTestCase {
     func testArraysNested() {
         // nest = [["a"], ["b"]]
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/arrays-nested.toml")
-        let arr: [Any] = try! actual.array("nest")
+        let arr: [Any] = actual.array("nest")!
         XCTAssertEqual(arr[0] as! [String], ["a"])
         XCTAssertEqual(arr[1] as! [String], ["b"])
     }
@@ -212,34 +207,34 @@ class TomlTests: XCTestCase {
     func testArrays() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/arrays.toml")
 
-        let ints: [Int] = try! actual.array("ints")
+        let ints: [Int] = actual.array("ints")!
         XCTAssertEqual(ints, [1, 2, 3])
 
-        let floats: [Double] = try! actual.array("floats")
+        let floats: [Double] = actual.array("floats")!
         XCTAssertEqual(floats, [1.1, 2.1, 3.1])
 
-        let strings: [String] = try! actual.array("strings")
+        let strings: [String] = actual.array("strings")!
         XCTAssertEqual(strings, ["a", "b", "c"])
 
-        let dates: [Date] = try! actual.array("dates")
+        let dates: [Date] = actual.array("dates")!
         XCTAssertEqual(dates, [Date(rfc3339String: "1987-07-05T17:45:00.0Z")!, Date(rfc3339String: "1979-05-27T07:32:00.0Z")!, Date(rfc3339String: "2006-06-01T11:00:00.0Z")!])
     }
 
     func testBool() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/bool.toml")
-        XCTAssertEqual(try actual.bool("t"), true)
-        XCTAssertEqual(try actual.bool("f"), false)
+        XCTAssertEqual(actual.bool("t"), true)
+        XCTAssertEqual(actual.bool("f"), false)
     }
 
     func testCommentsEverywhere() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/comments-everywhere.toml")
-        XCTAssertEqual(try actual.int("group", "answer"), 42)
-        XCTAssertEqual(try actual.array("group", "more"), [42, 42])
+        XCTAssertEqual(actual.int("group", "answer"), 42)
+        XCTAssertEqual(actual.array("group", "more"), [42, 42])
     }
 
     func testDatetime() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/datetime.toml")
-        XCTAssertEqual(try actual.date("bestdayever"), Date(rfc3339String: "1987-07-05T17:45:00.0Z")!)
+        XCTAssertEqual(actual.date("bestdayever"), Date(rfc3339String: "1987-07-05T17:45:00.0Z")!)
     }
 
     func testEmpty() {
@@ -248,177 +243,177 @@ class TomlTests: XCTestCase {
 
     func testExample() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/example.toml")
-        XCTAssertEqual(try actual.date("best-day-ever"), Date(rfc3339String: "1987-07-05T17:45:00.0Z")!)
-        XCTAssertFalse(try actual.bool("numtheory", "boring"))
-        XCTAssertEqual(try actual.array("numtheory", "perfection"), [6, 28, 496])
+        XCTAssertEqual(actual.date("best-day-ever"), Date(rfc3339String: "1987-07-05T17:45:00.0Z")!)
+        XCTAssertFalse(actual.bool("numtheory", "boring")!)
+        XCTAssertEqual(actual.array("numtheory", "perfection"), [6, 28, 496])
     }
 
     func testFloat() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/float.toml")
-        XCTAssertEqual(try actual.float("pi"), 3.14)
-        XCTAssertEqual(try actual.float("negpi"), -3.14)
+        XCTAssertEqual(actual.float("pi"), 3.14)
+        XCTAssertEqual(actual.float("negpi"), -3.14)
     }
 
     func testImplicitAndExplicitAfter() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/implicit-and-explicit-after.toml")
-        XCTAssertEqual(try actual.int("a", "b", "c", "answer"), 42)
-        XCTAssertEqual(try actual.int("a", "better"), 43)
+        XCTAssertEqual(actual.int("a", "b", "c", "answer"), 42)
+        XCTAssertEqual(actual.int("a", "better"), 43)
     }
 
     func testImplicitAndExplicitBefore() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/implicit-and-explicit-before.toml")
-        XCTAssertEqual(try actual.int("a", "b", "c", "answer"), 42)
-        XCTAssertEqual(try actual.int("a", "better"), 43)
+        XCTAssertEqual(actual.int("a", "b", "c", "answer"), 42)
+        XCTAssertEqual(actual.int("a", "better"), 43)
     }
 
     func testImplicitGroups() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/implicit-groups.toml")
-        XCTAssertEqual(try actual.int("a", "b", "c", "answer"), 42)
+        XCTAssertEqual(actual.int("a", "b", "c", "answer"), 42)
     }
 
     func testInteger() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/integer.toml")
-        XCTAssertEqual(try actual.int("answer"), 42)
-        XCTAssertEqual(try actual.int("neganswer"), -42)
+        XCTAssertEqual(actual.int("answer"), 42)
+        XCTAssertEqual(actual.int("neganswer"), -42)
     }
 
     func testKeyEqualsNospace() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/key-equals-nospace.toml")
-        XCTAssertEqual(try actual.int("answer"), 42)
+        XCTAssertEqual(actual.int("answer"), 42)
     }
 
     func testKeySpace() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/key-space.toml")
-        XCTAssertEqual(try actual.int("a b"), 1)
+        XCTAssertEqual(actual.int("a b"), 1)
     }
 
     func testKeySpecialChars() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/key-special-chars.toml")
-        XCTAssertEqual(try actual.int("~!@$^&*()_+-`1234567890[]|/?><.,;:'"), 1)
+        XCTAssertEqual(actual.int("~!@$^&*()_+-`1234567890[]|/?><.,;:'"), 1)
     }
 
     func testLongFloat() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/long-float.toml")
-        XCTAssertEqual(try actual.double("longpi"), 3.141592653589793)
-        XCTAssertEqual(try actual.double("neglongpi"), -3.141592653589793)
+        XCTAssertEqual(actual.double("longpi"), 3.141592653589793)
+        XCTAssertEqual(actual.double("neglongpi"), -3.141592653589793)
     }
 
     func testLongInteger() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/long-integer.toml")
-        XCTAssertEqual(try actual.int("answer"), 9223372036854775807)
-        XCTAssertEqual(try actual.int("neganswer"), -9223372036854775808)
+        XCTAssertEqual(actual.int("answer"), 9223372036854775807)
+        XCTAssertEqual(actual.int("neganswer"), -9223372036854775808)
     }
 
     func testMultilineString() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/multiline-string.toml")
-        XCTAssertEqual(try actual.string("multiline_empty_one"), "")
-        XCTAssertEqual(try actual.string("multiline_empty_two"), "")
-        XCTAssertEqual(try actual.string("multiline_empty_three"), "")
-        XCTAssertEqual(try actual.string("multiline_empty_four"), "")
+        XCTAssertEqual(actual.string("multiline_empty_one"), "")
+        XCTAssertEqual(actual.string("multiline_empty_two"), "")
+        XCTAssertEqual(actual.string("multiline_empty_three"), "")
+        XCTAssertEqual(actual.string("multiline_empty_four"), "")
         let expected = "The quick brown fox jumps over the lazy dog."
-        XCTAssertEqual(try actual.string("equivalent_one"), expected)
-        XCTAssertEqual(try actual.string("equivalent_two"), expected)
-        XCTAssertEqual(try actual.string("equivalent_three"), expected)
+        XCTAssertEqual(actual.string("equivalent_one"), expected)
+        XCTAssertEqual(actual.string("equivalent_two"), expected)
+        XCTAssertEqual(actual.string("equivalent_three"), expected)
     }
 
     func testRawMultilineString() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/raw-multiline-string.toml")
-        XCTAssertEqual(try actual.string("oneline"), "This string has a ' quote character.")
-        XCTAssertEqual(try actual.string("firstnl"), "This string has a ' quote character.")
-        XCTAssertEqual(try actual.string("multiline"), "This string\nhas ' a quote character\nand more than\none newline\nin it.")
+        XCTAssertEqual(actual.string("oneline"), "This string has a ' quote character.")
+        XCTAssertEqual(actual.string("firstnl"), "This string has a ' quote character.")
+        XCTAssertEqual(actual.string("multiline"), "This string\nhas ' a quote character\nand more than\none newline\nin it.")
     }
 
     func testRawString() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/raw-string.toml")
-        XCTAssertEqual(try actual.string("backspace"), "This string has a \\b backspace character.")
-        XCTAssertEqual(try actual.string("tab"), "This string has a \\t tab character.")
-        XCTAssertEqual(try actual.string("newline"), "This string has a \\n new line character.")
-        XCTAssertEqual(try actual.string("formfeed"), "This string has a \\f form feed character.")
-        XCTAssertEqual(try actual.string("carriage"), "This string has a \\r carriage return character.")
-        XCTAssertEqual(try actual.string("slash"), "This string has a \\/ slash character.")
-        XCTAssertEqual(try actual.string("backslash"), "This string has a \\\\ backslash character.")
+        XCTAssertEqual(actual.string("backspace"), "This string has a \\b backspace character.")
+        XCTAssertEqual(actual.string("tab"), "This string has a \\t tab character.")
+        XCTAssertEqual(actual.string("newline"), "This string has a \\n new line character.")
+        XCTAssertEqual(actual.string("formfeed"), "This string has a \\f form feed character.")
+        XCTAssertEqual(actual.string("carriage"), "This string has a \\r carriage return character.")
+        XCTAssertEqual(actual.string("slash"), "This string has a \\/ slash character.")
+        XCTAssertEqual(actual.string("backslash"), "This string has a \\\\ backslash character.")
     }
 
     func testStringEmpty() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/string-empty.toml")
-        XCTAssertEqual(try actual.string("answer"), "")
+        XCTAssertEqual(actual.string("answer"), "")
     }
 
     func testStringEscapes() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/string-escapes.toml")
-        XCTAssertEqual(try actual.string("backspace"), "This string has a \u{0008} backspace character.")
-        XCTAssertEqual(try actual.string("tab"), "This string has a \t tab character.")
-        XCTAssertEqual(try actual.string("newline"), "This string has a \n new line character.")
-        XCTAssertEqual(try actual.string("formfeed"), "This string has a \u{000C} form feed character.")
-        XCTAssertEqual(try actual.string("carriage"), "This string has a \r carriage return character.")
-        XCTAssertEqual(try actual.string("quote"), "This string has a \" quote character.")
-        XCTAssertEqual(try actual.string("backslash"), "This string has a \\ backslash character.")
-        XCTAssertEqual(try actual.string("notunicode1"), "This string does not have a unicode \\u escape.")
-        XCTAssertEqual(try actual.string("notunicode2"), "This string does not have a unicode \u{005C}u escape.")
-        XCTAssertEqual(try actual.string("notunicode3"), "This string does not have a unicode \\u0075 escape.")
-        XCTAssertEqual(try actual.string("notunicode4"), "This string does not have a unicode \\\u{0075} escape.")
+        XCTAssertEqual(actual.string("backspace"), "This string has a \u{0008} backspace character.")
+        XCTAssertEqual(actual.string("tab"), "This string has a \t tab character.")
+        XCTAssertEqual(actual.string("newline"), "This string has a \n new line character.")
+        XCTAssertEqual(actual.string("formfeed"), "This string has a \u{000C} form feed character.")
+        XCTAssertEqual(actual.string("carriage"), "This string has a \r carriage return character.")
+        XCTAssertEqual(actual.string("quote"), "This string has a \" quote character.")
+        XCTAssertEqual(actual.string("backslash"), "This string has a \\ backslash character.")
+        XCTAssertEqual(actual.string("notunicode1"), "This string does not have a unicode \\u escape.")
+        XCTAssertEqual(actual.string("notunicode2"), "This string does not have a unicode \u{005C}u escape.")
+        XCTAssertEqual(actual.string("notunicode3"), "This string does not have a unicode \\u0075 escape.")
+        XCTAssertEqual(actual.string("notunicode4"), "This string does not have a unicode \\\u{0075} escape.")
     }
 
     func testStringSimple() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/string-simple.toml")
-        XCTAssertEqual(try actual.string("answer"), "You are not drinking enough whisky.")
+        XCTAssertEqual(actual.string("answer"), "You are not drinking enough whisky.")
     }
 
     func testStringWithPound() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/string-with-pound.toml")
-        XCTAssertEqual(try actual.string("pound"), "We see no # comments here.")
-        XCTAssertEqual(try actual.string("poundcomment"), "But there are # some comments here.")
+        XCTAssertEqual(actual.string("pound"), "We see no # comments here.")
+        XCTAssertEqual(actual.string("poundcomment"), "But there are # some comments here.")
     }
 
     func testTableArrayImplicit() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-implicit.toml")
-        let array: [Toml] = try! actual.array("albums", "songs")
-        XCTAssertEqual(try array[0].string("name"), "Glory Days")
+        let array: [Toml] = actual.array("albums", "songs")!
+        XCTAssertEqual(array[0].string("name"), "Glory Days")
     }
 
     func testTableArrayMany() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-many.toml")
-        let array: [Toml] = try! actual.array("people")
+        let array: [Toml] = actual.array("people")!
         XCTAssertEqual(array.count, 3)
-        XCTAssertEqual(try array[0].string("first_name"), "Bruce")
-        XCTAssertEqual(try array[0].string("last_name"), "Springsteen")
+        XCTAssertEqual(array[0].string("first_name"), "Bruce")
+        XCTAssertEqual(array[0].string("last_name"), "Springsteen")
 
-        XCTAssertEqual(try array[1].string("first_name"), "Eric")
-        XCTAssertEqual(try array[1].string("last_name"), "Clapton")
+        XCTAssertEqual(array[1].string("first_name"), "Eric")
+        XCTAssertEqual(array[1].string("last_name"), "Clapton")
 
-        XCTAssertEqual(try array[2].string("first_name"), "Bob")
-        XCTAssertEqual(try array[2].string("last_name"), "Seger")
+        XCTAssertEqual(array[2].string("first_name"), "Bob")
+        XCTAssertEqual(array[2].string("last_name"), "Seger")
     }
 
     func testTableArrayNest() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-nest.toml")
         XCTAssertEqual(actual.keys.count, 1)
-        let array: [Toml] = try! actual.array("albums")
+        let array: [Toml] = actual.array("albums")!
         XCTAssertEqual(array.count, 2)
 
         // First one
         let first = array[0]
-        XCTAssertEqual(try first.string("name"), "Born to Run")
-        let first_songs: [Toml] = try! first.array("songs")
+        XCTAssertEqual(first.string("name"), "Born to Run")
+        let first_songs: [Toml] = first.array("songs")!
         XCTAssertEqual(first_songs.count, 2)
-        XCTAssertEqual(try first_songs[0].string("name"), "Jungleland")
-        XCTAssertEqual(try first_songs[1].string("name"), "Meeting Across the River")
+        XCTAssertEqual(first_songs[0].string("name"), "Jungleland")
+        XCTAssertEqual(first_songs[1].string("name"), "Meeting Across the River")
 
         // Second one
         let second = array[1]
-        XCTAssertEqual(try second.string("name"), "Born in the USA")
-        let second_songs: [Toml] = try! second.array("songs")
+        XCTAssertEqual(second.string("name"), "Born in the USA")
+        let second_songs: [Toml] = second.array("songs")!
         XCTAssertEqual(second_songs.count, 2)
-        XCTAssertEqual(try second_songs[0].string("name"), "Glory Days")
-        XCTAssertEqual(try second_songs[1].string("name"), "Dancing in the Dark")
+        XCTAssertEqual(second_songs[0].string("name"), "Glory Days")
+        XCTAssertEqual(second_songs[1].string("name"), "Dancing in the Dark")
     }
 
     func testTableArrayOne() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-one.toml")
         XCTAssertEqual(actual.keys.count, 1)
-        let array: [Toml] = try! actual.array("people")
-        XCTAssertEqual(try array[0].string("first_name"), "Bruce")
-        XCTAssertEqual(try array[0].string("last_name"), "Springsteen")
+        let array: [Toml] = actual.array("people")!
+        XCTAssertEqual(array[0].string("first_name"), "Bruce")
+        XCTAssertEqual(array[0].string("last_name"), "Springsteen")
     }
 
     func testTableEmpty() {
@@ -435,18 +430,18 @@ class TomlTests: XCTestCase {
 
     func testTableWithPound() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-with-pound.toml")
-        XCTAssertEqual(try actual.int("key#group", "answer"), 42)
+        XCTAssertEqual(actual.int("key#group", "answer"), 42)
     }
 
     func testUnicodeEscape() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/unicode-escape.toml")
-        XCTAssertEqual(try actual.string("answer4"), "\u{03B4}")
-        XCTAssertEqual(try actual.string("answer8"), "\u{000003B4}")
+        XCTAssertEqual(actual.string("answer4"), "\u{03B4}")
+        XCTAssertEqual(actual.string("answer8"), "\u{000003B4}")
     }
 
     func testUnicodeLiteral() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/unicode-literal.toml")
-        XCTAssertEqual(try actual.string("answer"), "\u{03B4}")
+        XCTAssertEqual(actual.string("answer"), "\u{03B4}")
     }
 
     // MARK: invalid tests
@@ -628,7 +623,6 @@ class TomlTests: XCTestCase {
     static var allTests : [(String, (TomlTests) -> () throws -> Void)] {
         return [
             ("testSimple", testSimple),
-            ("testKeyError", testKeyError),
             // ("testDateFormat", testDateFormat), // see comment on function
             ("testNestedTables", testNestedTables),
             ("testImplicitlyDefinedTable", testImplicitlyDefinedTable),

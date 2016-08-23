@@ -23,7 +23,6 @@ import Foundation
     - InvalidDateFormat: Date string is not a supported format
     - InvalidEscapeSequence: Unsupported escape sequence used in string
     - InvalidUnicodeCharacter: Non-existant unicode character specified
-    - KeyError: Key does not exist
     - MixedArrayType: Array is composed of multiple types, members must all be the same type
     - SyntaxError: Document cannot be parsed due to a syntax error
 */
@@ -32,7 +31,6 @@ public enum TomlError: Error {
     case InvalidDateFormat(String)
     case InvalidEscapeSequence(String)
     case InvalidUnicodeCharacter(Int)
-    case KeyError(String)
     case MixedArrayType(String)
     case SyntaxError(String)
 }
@@ -88,8 +86,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: An array of supported key names
     */
-    public var keys: [String] {
-        return Array(data.keys)
+    public var keys: Set<[String]> {
+        return keyNames
     }
 
     /**
@@ -164,17 +162,14 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of array
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the array cannot be coerced to type [T]
-
         - Returns: An array of type [T]
     */
-    public func array<T>(_ path: [String]) throws -> [T] {
+    public func array<T>(_ path: [String]) -> [T]? {
         if let val = data[String(describing: path)] {
-            return val as! [T]
+            return val as? [T]
         }
 
-        throw TomlError.KeyError(String(describing: path))
+        return nil
     }
 
     /**
@@ -182,13 +177,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of array
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the array cannot be coerced to type [T]
-
         - Returns: An array of type [T]
     */
-    public func array<T>(_ path: String...) throws -> [T] {
-        return try array(path)
+    public func array<T>(_ path: String...) -> [T]? {
+        return array(path)
     }
 
     /**
@@ -196,13 +188,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type boolean
-
         - Returns: boolean value of key path
     */
-    public func bool(_ path: String...) throws -> Bool {
-        return try value(path)
+    public func bool(_ path: String...) -> Bool? {
+        return value(path)
     }
 
     /**
@@ -210,13 +199,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type date
-
         - Returns: date value of key path
     */
-    public func date(_ path: String...) throws -> Date {
-        return try value(path)
+    public func date(_ path: String...) -> Date? {
+        return value(path)
     }
 
     /**
@@ -224,13 +210,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type double
-
         - Returns: double value of key path
     */
-    public func double(_ path: [String]) throws -> Double {
-        return try value(path)
+    public func double(_ path: [String]) -> Double? {
+        return value(path)
     }
 
     /**
@@ -238,13 +221,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type double
-
         - Returns: double value of key path
     */
-    public func double(_ path: String...) throws -> Double {
-        return try double(path)
+    public func double(_ path: String...) -> Double? {
+        return double(path)
     }
 
     /**
@@ -252,13 +232,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type double
-
         - Returns: double value of key path
     */
-    public func float(_ path: String...) throws -> Double {
-        return try double(path)
+    public func float(_ path: String...) -> Double? {
+        return double(path)
     }
 
     /**
@@ -266,13 +243,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type int
-
         - Returns: int value of key path
     */
-    public func int(_ path: String...) throws -> Int {
-        return try value(path)
+    public func int(_ path: String...) -> Int? {
+        return value(path)
     }
 
     /**
@@ -280,13 +254,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type string
-
         - Returns: string value of key path
     */
-    public func string(_ path: String...) throws -> String {
-        return try value(path)
+    public func string(_ path: String...) -> String? {
+        return value(path)
     }
 
     /**
@@ -295,18 +266,16 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter parent: Root key path
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-
         - Returns: Dictionary of key names and tables
     */
-    public func tables(_ parent: String...) throws -> [String: Toml] {
+    public func tables(_ parent: String...) -> [String: Toml] {
         var result = [String: Toml]()
         for tableName in tableNames {
             var tableParent = tableName
             tableParent.removeLast()
             if parent == tableParent {
                 // this is a table to include
-                result[tableName.map(quoted).joined(separator: ".")] = try table(from: tableName)
+                result[tableName.map(quoted).joined(separator: ".")] = table(from: tableName)
             }
         }
         return result
@@ -318,11 +287,9 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter from: Key path to create table from
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-
         - Returns: `Toml` table of all keys beneath the specified path
     */
-    public func table(from path: [String]) throws -> Toml {
+    public func table(from path: [String]) -> Toml {
         let constructedTable = Toml()
 
         // add values
@@ -330,7 +297,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             var keyArray = keyName
             if keyArray.begins(with: path) {
                 keyArray.removeSubrange(0..<path.count)
-                constructedTable.setValue(key: keyArray, value: try self.value(keyName))
+                constructedTable.setValue(key: keyArray, value: self.value(keyName)!)
             }
         }
 
@@ -353,13 +320,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value requested is not a table
-
         - Returns: Table of name `path`
     */
-    public func table(_ path: String...) throws -> Toml {
-        return try value(path)
+    public func table(_ path: String...) -> Toml? {
+        return value(path)
     }
 
     /**
@@ -367,21 +331,52 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter path: Key path of value
 
-        - Throws: `TomlError.KeyError` if the requested key path does not exist
-            `RuntimeError` if the value cannot be coerced to type T
+        - Returns: value of key path
+    */
+    public func value<T>(_ path: String...) throws -> T? {
+        return value(path)
+    }
+
+    /**
+        Get a value of type T from the specified key path.
+
+        - Parameter path: Key path of value
 
         - Returns: value of key path
     */
-    public func value<T>(_ path: String...) throws -> T {
-        return try value(path)
-    }
-
-    private func value<T>(_ path: [String]) throws -> T {
+    public func value<T>(_ path: [String]) -> T? {
         if let val = data[String(describing: path)] {
-            return val as! T
+            return val as? T
         }
 
-        throw TomlError.KeyError(String(describing: path))
+        return nil
+    }
+
+    /**
+        Get the value specified by path as a string
+
+        - Parameter path: Key path of value
+
+        - Returns: value of key path as a string
+    */
+    public func valueDescription(_ path: [String]) -> String? {
+        if let check = data[String(describing: path)] {
+            if let intVal = check as? Int {
+                return String(describing: intVal)
+            } else if let doubleVal = check as? Double {
+                return String(describing: doubleVal)
+            } else if let stringVal = check as? String {
+                return stringVal
+            } else if let boolVal = check as? Bool {
+                return String(describing: boolVal)
+            } else if let dateVal = check as? Date {
+                return String(describing: dateVal)
+            }
+
+            return String(describing: check)
+        }
+
+        return nil
     }
 
     /**
@@ -390,6 +385,6 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: String version of TOML document
     */
     public var description: String {
-        return "\(String(describing: data))"
+        return serialize(toml: self)
     }
 }

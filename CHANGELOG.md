@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- All accessor methods now return `Optionals` and do not throw.  Notably, this
+  means that `TomlError.KeyError` is no longer thrown if a missing key is
+  requested.
+- `Toml.keys` now returns a `Set<[String]> of value key names
+- Moved `Toml.setValue(_:[String])` from  the private API to the public API
 
 ## [0.3.0] - 2016-08-19
 ### Added
