@@ -35,8 +35,7 @@ class TomlTests: XCTestCase {
         XCTAssertFalse(actual.hasTable("non-existant-table"))
         XCTAssertFalse(actual.hasKey("inline_table", "4"))
 
-        let actual_array: [Int] = try! actual.array("array")
-        XCTAssertEqual(actual_array, [1, 2, 3])
+        XCTAssertEqual(actual.array("array"), [1, 2, 3])
     }
 
     func testImplicitlyDefinedTable() {
