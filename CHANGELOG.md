@@ -16,11 +16,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `Toml.description` now returns a valid TOML string
 - Moved `Toml.setValue(_:[String])` from  the private API to the public API
 
+## [0.3.1] - 2016-08-23
+### Changed
+- `hasKey(_ key: [String]) throws -> Bool` changed to
+  `hasKey(key: [String], includeTables: Bool = true) throws -> Bool` to support
+  inclusion of inline tables as valid key paths.
+- `hasKey(_ key: ...) throws -> Bool` now returns true if the key path refers
+  to a table
+
+### Fixed
+- [Issue #3] `hasTable(_: [String])` now correctly returns true for inline tables
+- `table(_: String...)` now correctly returns a Toml table for the requested
+  key path
+
 ## [0.3.0] - 2016-08-19
 ### Added
-- Support for iterating over all tables at a given level with `tables(_: [String])`
+- [Issue #2] Support for iterating over all tables at a given level with `tables(_: [String])`
   method.
-    - Resolves [Issue #2](https://github.com/jdfergason/swift-toml/issues/2)
 - Added public API call for retrieving a TOML table at a specified level with
   `table(from: [String])` method.
 
@@ -39,7 +51,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Parse [TOML 0.4.0](https://github.com/toml-lang/toml) files with Swift 3.0
 
-[Unreleased]: https://github.com/jdfergason/swift-toml/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/jdfergason/swift-toml/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/jdfergason/swift-toml/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jdfergason/swift-toml/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jdfergason/swift-toml/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jdfergason/swift-toml/tree/v0.1.0
+[Issue #2]: https://github.com/jdfergason/swift-toml/issues/2
+[Issue #3]: https://github.com/jdfergason/swift-toml/issues/3

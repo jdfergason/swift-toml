@@ -115,11 +115,15 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         Check if the TOML document contains the specified key.
 
         - Parameter key: Key path to check
+        - Parameter includeTables: Include tables and inline tables in key path check
 
         - Returns: True if key exists; false otherwise
     */
-    public func hasKey(_ key: [String]) -> Bool {
-        let keyExists = data[String(describing: key)] != nil
+    public func hasKey(key: [String], includeTables: Bool = true) -> Bool {
+        var keyExists = data[String(describing: key)] != nil
+        if includeTables {
+            keyExists = keyExists || hasTable(key)
+        }
         return keyExists
     }
 
@@ -131,7 +135,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if key exists; false otherwise
     */
     public func hasKey(_ key: String...) -> Bool {
-        return hasKey(key)
+        return hasKey(key: key)
     }
 
     /**
@@ -323,7 +327,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: Table of name `path`
     */
     public func table(_ path: String...) -> Toml? {
-        return value(path)
+        return table(from: path)
     }
 
     /**

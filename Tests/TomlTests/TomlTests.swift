@@ -29,7 +29,13 @@ class TomlTests: XCTestCase {
         XCTAssertEqual(actual.string("inline_table", "1"), "one")
         XCTAssertEqual(actual.string("inline_table", "3"), "three")
 
-        let actual_array: [Int] = actual.array("array")!
+        // check hasKey and hasTable
+        XCTAssertTrue(actual.hasTable("inline_table"))
+        XCTAssertTrue(actual.hasKey("inline_table", "1"))
+        XCTAssertFalse(actual.hasTable("non-existant-table"))
+        XCTAssertFalse(actual.hasKey("inline_table", "4"))
+
+        let actual_array: [Int] = try! actual.array("array")
         XCTAssertEqual(actual_array, [1, 2, 3])
     }
 

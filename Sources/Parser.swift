@@ -126,7 +126,7 @@ class Parser {
         var key = keyPath
         key.append(currentKey)
 
-        if toml.hasKey(key) {
+        if toml.hasKey(key: key) {
             throw TomlError.DuplicateKey(String(describing: key))
         }
 
@@ -154,7 +154,7 @@ class Parser {
                 }
 
                 let keyPathStr = String(describing: keyPath)
-                if toml.hasKey(keyPath) || declaredTables.contains(keyPathStr) {
+                if toml.hasKey(key: keyPath, includeTables: false) || declaredTables.contains(keyPathStr) {
                     throw TomlError.DuplicateKey(String(describing: keyPath))
                 }
 
@@ -223,6 +223,8 @@ class Parser {
 
         let tableTokens = extractTableTokens(tokens: &tokens, inline: true)
         try parse(tokens: tableTokens)
+
+        toml.setTable(key: keyPath)
 
         // This was an inline table so remove from keyPath
         keyPath.removeLast()
