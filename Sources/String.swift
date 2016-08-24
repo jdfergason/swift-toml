@@ -133,3 +133,23 @@ func quoted(_ value: String) -> String {
 
     return value
 }
+
+/**
+    Escape the string according to the rules of a single line Toml string
+
+    - Parameters string: The string to escape
+
+    - Returns: Escaped version of the string
+*/
+func escape(string: String) -> String {
+    var result: String
+    let escapeMap = ["\n": "\\n", "\r": "\\r", "\t": "\\t", "\"": "\\\""]
+
+    // must escape \ first because it is the escape character
+    result = string.replacingOccurrences(of: "\\", with: "\\\\")
+    for (key, val) in escapeMap {
+        result = result.replacingOccurrences(of: key, with: val)
+    }
+
+    return result
+}

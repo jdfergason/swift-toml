@@ -370,7 +370,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             } else if let doubleVal = check as? Double {
                 return String(describing: doubleVal)
             } else if let stringVal = check as? String {
-                return stringVal
+                return "\"\(escape(string: stringVal))\""
             } else if let boolVal = check as? Bool {
                 return String(describing: boolVal)
             } else if let dateVal = check as? Date {
