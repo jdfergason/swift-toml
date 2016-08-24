@@ -15,16 +15,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   to a table
 
 ### Fixed
-- `hasTable(_: [String])` now correctly returns true for inline tables
-    - Resolves [Issue #3](https://github.com/jdfergason/swift-toml/issues/3)
+- [Issue #3] `hasTable(_: [String])` now correctly returns true for inline tables
 - `table(_: String...)` now correctly returns a Toml table for the requested
   key path
 
 ## [0.3.0] - 2016-08-19
 ### Added
-- Support for iterating over all tables at a given level with `tables(_: [String])`
+- [Issue #2] Support for iterating over all tables at a given level with `tables(_: [String])`
   method.
-    - Resolves [Issue #2](https://github.com/jdfergason/swift-toml/issues/2)
 - Added public API call for retrieving a TOML table at a specified level with
   `table(from: [String])` method.
 
@@ -48,3 +46,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.3.0]: https://github.com/jdfergason/swift-toml/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jdfergason/swift-toml/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jdfergason/swift-toml/tree/v0.1.0
+[Issue #2]: https://github.com/jdfergason/swift-toml/issues/2
+[Issue #3]: https://github.com/jdfergason/swift-toml/issues/3
