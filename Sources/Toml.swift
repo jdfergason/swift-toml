@@ -43,9 +43,16 @@ protocol SetValueProtocol {
     Data parsed from a TOML document
 */
 public class Toml: CustomStringConvertible, SetValueProtocol {
-    private var data: [String: Any] = [String: Any]()
-    private var tableNames = Set<[String]>()
-    private var keyNames = Set<[String]>()
+    private var data: [String: Any]
+    private(set) public var keyNames: Set<[String]>
+    private(set) public var prefixPath: [String]?
+    private(set) public var tableNames: Set<[String]>
+
+    public init() {
+        data = [String: Any]()
+        keyNames = Set<[String]>()
+        tableNames = Set<[String]>()
+    }
 
     /**
         Read the specified TOML file from disk.
@@ -82,12 +89,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     }
 
     /**
-        Get an array of all keys in the TOML document.
 
-        - Returns: An array of supported key names
     */
-    public var keys: Set<[String]> {
-        return keyNames
     }
 
     /**

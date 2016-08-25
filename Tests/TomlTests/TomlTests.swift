@@ -392,7 +392,7 @@ class TomlTests: XCTestCase {
 
     func testTableArrayNest() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-nest.toml")
-        XCTAssertEqual(actual.keys.count, 1)
+        XCTAssertEqual(actual.keyNames.count, 1)
         let array: [Toml] = actual.array("albums")!
         XCTAssertEqual(array.count, 2)
 
@@ -415,7 +415,7 @@ class TomlTests: XCTestCase {
 
     func testTableArrayOne() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/table-array-one.toml")
-        XCTAssertEqual(actual.keys.count, 1)
+        XCTAssertEqual(actual.keyNames.count, 1)
         let array: [Toml] = actual.array("people")!
         XCTAssertEqual(array[0].string("first_name"), "Bruce")
         XCTAssertEqual(array[0].string("last_name"), "Springsteen")
