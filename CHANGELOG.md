@@ -6,15 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Support for serializing a `Toml` object to a valid TOML string
+- Serialize a `Toml` object to a valid TOML string
+- Resolve the full key path to tables through `prefixPath: [String]`
+- All accessors have [String] and String... (variadic) based variants
 
 ### Changed
 - All accessor methods now return `Optionals` and do not throw.  Notably, this
   means that `TomlError.KeyError` is no longer thrown if a missing key is
   requested.
-- `Toml.keys` now returns a `Set<[String]> of value key names
+- `Toml.keys` removed; use: `keyNames: Set<[String]>` to access key names
+- `tableNames: Set<[String]>` is now part of the public API for accessing table names
 - `Toml.description` now returns a valid TOML string
-- Moved `Toml.setValue(_:[String])` from  the private API to the public API
+- `Toml.setValue(_:[String])` is now part of the public API
+- `Toml.float` has been removed
 
 ## [0.3.1] - 2016-08-23
 ### Changed
