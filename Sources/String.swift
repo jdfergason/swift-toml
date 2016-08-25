@@ -126,8 +126,8 @@ extension String {
 // Mark: String related array extensions
 
 func quoted(_ value: String) -> String {
-    if let _ = value.match(".*[\\u0020-\\u002B\\u002D-\\u002F\\u003A-\\u0040" +
-        "\\u005B-\\u005E\\u005F\\u0060\\u007B-\\uFFFF]+.*") {
+    if let _ = value.match(".*[\\u0020-\\u002B\\u002E-\\u002F\\u003A-\\u0040" +
+        "\\u005B-\\u005E\\u0060\\u007B-\\uFFFF]+.*") {
         return "\"\(value)\""
     }
 
