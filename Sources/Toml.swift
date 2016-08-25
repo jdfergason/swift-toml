@@ -378,6 +378,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
                 return String(describing: boolVal)
             } else if let dateVal = check as? Date {
                 return dateVal.rfc3339String()
+            } else if let tableArray = check as? [Toml] {
+                return serializeArrayOfTables(tables: tableArray)
             }
 
             return String(describing: check)
