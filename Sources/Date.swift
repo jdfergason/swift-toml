@@ -60,4 +60,8 @@ extension Date {
             return nil
         }
     }
+
+    func rfc3339String() -> String {
+        return rfc3339fractionalformatter.string(from: self)
+    }
 }
