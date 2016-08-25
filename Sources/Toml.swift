@@ -202,7 +202,29 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: boolean value of key path
     */
+    public func bool(_ path: [String]) -> Bool? {
+        return value(path)
+    }
+
+    /**
+        Get a boolean value from the specified key path.
+
+        - Parameter path: Key path of value
+
+        - Returns: boolean value of key path
+    */
     public func bool(_ path: String...) -> Bool? {
+        return value(path)
+    }
+
+    /**
+        Get a date value from the specified key path.
+
+        - Parameter path: Key path of value
+
+        - Returns: date value of key path
+    */
+    public func date(_ path: [String]) -> Date? {
         return value(path)
     }
 
@@ -240,14 +262,14 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     }
 
     /**
-        Get a double value from the specified key path.
+        Get a int value from the specified key path.
 
         - Parameter path: Key path of value
 
-        - Returns: double value of key path
+        - Returns: int value of key path
     */
-    public func float(_ path: String...) -> Double? {
-        return double(path)
+    public func int(_ path: [String]) -> Int? {
+        return value(path)
     }
 
     /**
@@ -258,6 +280,17 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: int value of key path
     */
     public func int(_ path: String...) -> Int? {
+        return value(path)
+    }
+
+    /**
+        Get a string value from the specified key path.
+
+        - Parameter path: Key path of value
+
+        - Returns: string value of key path
+    */
+    public func string(_ path: [String]) -> String? {
         return value(path)
     }
 
@@ -280,7 +313,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: Dictionary of key names and tables
     */
-    public func tables(_ parent: String...) -> [String: Toml] {
+    public func tables(_ parent: [String]) -> [String: Toml] {
         var result = [String: Toml]()
         for tableName in tableNames {
             var tableParent = tableName
@@ -299,6 +332,18 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     }
 
     /**
+        Get a dictionary of all tables 1-level down from the given key
+        path.  To get all tables at the root level call with no parameters.
+
+        - Parameter parent: Root key path
+
+        - Returns: Dictionary of key names and tables
+    */
+    public func tables(_ parent: String...) -> [String: Toml] {
+        return tables(parent)
+    }
+
+    /**
         Return a TOML table that contains everything beneath the specified
         path.
 
@@ -307,7 +352,12 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: `Toml` table of all keys beneath the specified path
     */
     public func table(from path: [String]) -> Toml {
-        let constructedTable = Toml()
+        var fullTablePrefix = path
+        if let tablePrefix = prefixPath {
+            fullTablePrefix = tablePrefix + path
+        }
+
+        let constructedTable = Toml(prefixPath: fullTablePrefix)
 
         // add values
         for keyName in keyNames {
@@ -350,8 +400,12 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: value of key path
     */
-    public func value<T>(_ path: String...) throws -> T? {
-        return value(path)
+    public func value<T>(_ path: [String]) -> T? {
+        if let val = data[String(describing: path)] {
+            return val as? T
+        }
+
+        return nil
     }
 
     /**
@@ -361,12 +415,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Returns: value of key path
     */
-    public func value<T>(_ path: [String]) -> T? {
-        if let val = data[String(describing: path)] {
-            return val as? T
-        }
-
-        return nil
+    public func value<T>(_ path: String...) throws -> T? {
+        return value(path)
     }
 
     /**
