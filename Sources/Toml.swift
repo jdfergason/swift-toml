@@ -374,7 +374,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             } else if let boolVal = check as? Bool {
                 return String(describing: boolVal)
             } else if let dateVal = check as? Date {
-                return String(describing: dateVal)
+                return dateVal.rfc3339String()
             }
 
             return String(describing: check)
