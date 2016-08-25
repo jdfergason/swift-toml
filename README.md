@@ -58,10 +58,10 @@ Both functions return a Toml object of parsed key/value pairs
 
     // get table
     let table1 = try toml.table("table1")
-    
+
     // iterate over all tables at the root level
     for (tablePath, table) in try toml.tables() { ... }
-    
+
     // iterate over all tables under table1
     for (tablePath, table) in try toml.tables("table1") { ... }
 
@@ -75,7 +75,7 @@ Add the project to  to your Package.swift file as a dependency:
 
 ## Compatibility
 
-SwiftToml is compatible with Swift 3.0.
+SwiftToml is compatible with Swift 3.0 and TOML 0.4.0.
 
 It has been tested with SWIFT-3.0-PREVIEW-6 on Mac OS X, Ubuntu 14.04, and Fedora 23.  Currently it only works with Mac OS X due to some features of Swift not currently working under linux.  I am actively working to fully support linux.
 
