@@ -1,0 +1,47 @@
+# basic key value serialization
+int = 32
+double = 3.14
+date = 2016-08-24T12:00:32.00Z
+string = "Hello"
+literal = 'hello'
+multi = """
+Yes this
+is a multi-line string"""
+multi_literal = '''\Hello'
+Second multi-line
+/end/'''
+int-array = [1, 2 ,3] # intentional white-space change
+double-array = [1.1, 2.2, 3.3]
+string-array = ["yes", "no"]
+array-of-arrays = [[1, 2], ["a", "b"]]
+inline-table = {name = "Jack", age = 32, starts = 4.9}
+
+# table
+[atable]
+name = "the table"
+tough = "not really"
+a_number = 41
+
+# nested-table
+[table1.nested]
+description = "table1 is implicitly created; but it should not show up in the serialization"
+
+[table3.someother.really.nested]
+movealong = 5
+
+[table3]
+created = "after"
+nested-inline = {roen = "marks", n0t = "will th\u0023is work?"}
+
+# nested-table no parent
+
+# array of tables
+[[table-array]]
+name = "tom"
+
+[[table-array]]
+name = "lucinda"
+
+[[table-array]]
+name = "greg"
+last = "lujo"

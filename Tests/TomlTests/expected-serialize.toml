@@ -1,0 +1,37 @@
+array-of-arrays = [[1, 2], ["a", "b"]]
+date = 2016-08-24T12:00:32.000000Z
+double = 3.14
+double-array = [1.1000000000000001, 2.2000000000000002, 3.2999999999999998]
+int = 32
+int-array = [1, 2, 3]
+literal = "hello"
+multi = "Yes this\nis a multi-line string"
+multi_literal = "\\Hello'\nSecond multi-line\n/end/"
+string = "Hello"
+string-array = ["yes", "no"]
+table-array = [{name = "tom"},
+  {name = "lucinda"},
+  {last = "lujo", name = "greg"}]
+
+[atable]
+a_number = 41
+name = "the table"
+tough = "not really"
+
+[inline-table]
+age = 32
+name = "Jack"
+starts = 4.9
+
+[table1.nested]
+description = "table1 is implicitly created; but it should not show up in the serialization"
+
+[table3]
+created = "after"
+
+[table3.nested-inline]
+n0t = "will th#is work?"
+roen = "marks"
+
+[table3.someother.really.nested]
+movealong = 5

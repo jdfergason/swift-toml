@@ -23,7 +23,7 @@ class TomlTests: XCTestCase {
         XCTAssertEqual(actual.string("string"), "value")
         XCTAssertEqual(actual.string("literal_string"), "lite\\ral")
         XCTAssertEqual(actual.int("int"), 1)
-        XCTAssertEqual(actual.float("float"), 3.14)
+        XCTAssertEqual(actual.double("float"), 3.14)
         XCTAssertEqual(actual.bool("bool"), true)
         XCTAssertEqual(actual.date("date"), Date(rfc3339String: "1982-07-27T12:00:00.0Z"))
         XCTAssertEqual(actual.string("inline_table", "1"), "one")
@@ -38,6 +38,12 @@ class TomlTests: XCTestCase {
         XCTAssertEqual(actual.array("array"), [1, 2, 3])
     }
 
+    func testSerialize() {
+        let actual = try! Toml(contentsOfFile: "Tests/TomlTests/serialize.toml")
+        let expected = try! String(contentsOfFile: "Tests/TomlTests/expected-serialize.toml")
+        XCTAssertEqual(String(describing: actual), expected.trim())
+    }
+
     func testImplicitlyDefinedTable() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
         XCTAssertTrue(actual.hasTable("table2"))
@@ -47,39 +53,17 @@ class TomlTests: XCTestCase {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/nested-tables.toml")
         // All tables
         var expectedKeys = ["table1", "table2"]
-        var expectedTables = ["[\"[\\\"sub\\\", \\\"yes\\\"]\": Optional(3.1400000000000001)]",
-            "[\"[\\\"sub2\\\", \\\"hello\\\"]\": Optional(true), " +
-            "\"[\\\"sub\\\", \\\"safety\\\"]\": Optional(\"gravel\"), " +
-            "\"[\\\"key\\\"]\": Optional(\"yes\")]"]
         var actualKeys: [String] = []
-        var actualTables: [String] = []
-        for (key, table) in actual.tables() {
+        for (key, _) in actual.tables() {
             actualKeys.append(key)
-            actualTables.append(String(describing: table))
         }
         expectedKeys.sort()
         actualKeys.sort()
-        XCTAssertEqual(String(describing: expectedKeys), String(describing: actualKeys))
-        expectedTables.sort()
-        actualTables.sort()
-        XCTAssertEqual(String(describing: expectedTables), String(describing: actualTables))
 
-        // Only everything under table1
-        expectedKeys = ["table1.sub", "table1.sub2"]
-        actualKeys = []
-        expectedTables = ["[\"[\\\"hello\\\"]\": Optional(true)]",
-            "[\"[\\\"safety\\\"]\": Optional(\"gravel\")]"]
-        actualTables = []
-        for (key, table) in actual.tables("table1") {
-            actualKeys.append(key)
-            actualTables.append(String(describing: table))
-        }
-        expectedKeys.sort()
-        actualKeys.sort()
         XCTAssertEqual(String(describing: expectedKeys), String(describing: actualKeys))
-        expectedTables.sort()
-        actualTables.sort()
-        XCTAssertEqual(String(describing: expectedTables), String(describing: actualTables))
+        let expectedTables = try! String(contentsOfFile: "Tests/TomlTests/expected-nested-tables.toml")
+
+        XCTAssertEqual(expectedTables.trim(), String(describing: actual).trim())
     }
 
     /* This test fails in TravisCI for some reason ... it passes on my local machine; disable until we figure out what's going on.
@@ -255,8 +239,8 @@ class TomlTests: XCTestCase {
 
     func testFloat() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/float.toml")
-        XCTAssertEqual(actual.float("pi"), 3.14)
-        XCTAssertEqual(actual.float("negpi"), -3.14)
+        XCTAssertEqual(actual.double("pi"), 3.14)
+        XCTAssertEqual(actual.double("negpi"), -3.14)
     }
 
     func testImplicitAndExplicitAfter() {
