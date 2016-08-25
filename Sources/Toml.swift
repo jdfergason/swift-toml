@@ -89,8 +89,13 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
     }
 
     /**
+        Create an empty Toml object with the specified prefix path
 
+        - Parameter prefixPath: The path to prefix all tables with
     */
+    private convenience init(prefixPath: [String]) {
+        self.init()
+        self.prefixPath = prefixPath
     }
 
     /**
@@ -279,10 +284,15 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         var result = [String: Toml]()
         for tableName in tableNames {
             var tableParent = tableName
+            var myTableName = tableName
+            if let tablePrefix = prefixPath {
+                myTableName = tablePrefix + tableName
+            }
+
             tableParent.removeLast()
             if parent == tableParent {
                 // this is a table to include
-                result[tableName.map(quoted).joined(separator: ".")] = table(from: tableName)
+                result[myTableName.map(quoted).joined(separator: ".")] = table(from: tableName)
             }
         }
         return result
