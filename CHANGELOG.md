@@ -5,13 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [0.4.0] - 2016-08-24
 ### Added
 - Serialize a `Toml` object to a valid TOML string
 - Resolve the full key path to tables through `prefixPath: [String]`
 - All accessors have [String] and String... (variadic) based variants
 
 ### Changed
-- All accessor methods now return `Optionals` and do not throw.  Notably, this
+- [Issue #4] All accessor methods now return `Optionals` and do not throw.  Notably, this
   means that `TomlError.KeyError` is no longer thrown if a missing key is
   requested.
 - `Toml.keys` removed; use: `keyNames: Set<[String]>` to access key names
@@ -55,10 +57,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Parse [TOML 0.4.0](https://github.com/toml-lang/toml) files with Swift 3.0
 
-[Unreleased]: https://github.com/jdfergason/swift-toml/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/jdfergason/swift-toml/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/jdfergason/swift-toml/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/jdfergason/swift-toml/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jdfergason/swift-toml/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jdfergason/swift-toml/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jdfergason/swift-toml/tree/v0.1.0
 [Issue #2]: https://github.com/jdfergason/swift-toml/issues/2
 [Issue #3]: https://github.com/jdfergason/swift-toml/issues/3
+[Issue #4]: https://github.com/jdfergason/swift-toml/issues/4
