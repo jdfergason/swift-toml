@@ -36,34 +36,34 @@ Both functions return a Toml object of parsed key/value pairs
     let toml = try Toml(contentsOfFile: "/path/to/file.toml")
 
     // string value
-    print(try toml.string("table1", "name"))
+    print(toml.string("table1", "name"))
 
     // boolean value
-    print(try toml.boolean("table1", "manager"))
+    print(toml.bool("table1", "manager"))
 
     // integer value
-    print(try toml.int("table1", "age"))
+    print(toml.int("table1", "age"))
 
     // double value
-    print(try toml.double("table1", "rating"))
+    print(toml.double("table1", "rating"))
 
     // date value
-    print(try toml.date("table1", "birthday"))
+    print(toml.date("table1", "birthday"))
 
     // get value and resolve type at runtime
-    print(try toml.value("title"))
+    print(try toml.value("title")!)
 
     // get array of type [String]
-    let array: [String] = try toml.array("locations")
+    let array: [String] = toml.array("locations")!
 
     // get table
-    let table1 = try toml.table("table1")
+    let table1 = toml.table("table1")
 
     // iterate over all tables at the root level
-    for (tablePath, table) in try toml.tables() { ... }
+    for (tablePath, table) in toml.tables() { ... }
 
     // iterate over all tables under table1
-    for (tablePath, table) in try toml.tables("table1") { ... }
+    for (tablePath, table) in toml.tables("table1") { ... }
 
 ## Installation
 
