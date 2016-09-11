@@ -26,7 +26,7 @@ class Evaluator {
     let pop: Bool
     let multiline: Bool
 
-    init (regex: String, generator: TokenGenerator,
+    init (regex: String, generator: @escaping TokenGenerator,
           push: [String]? = nil, pop: Bool = false, multiline: Bool = false) {
         self.regex = regex
         self.generator = generator
