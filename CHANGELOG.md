@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Updated to Swift 3.0 GM
+- Updated examples in README.md to reflect current API
 
 ## [0.4.0] - 2016-08-24
 ### Added
