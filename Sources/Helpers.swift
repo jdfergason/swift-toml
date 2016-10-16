@@ -23,7 +23,7 @@ class ArrayWrapper: SetValueProtocol {
         self.array = array
     }
 
-    public func setValue(key: [String], value: Any) {
+    public func set(value: Any, for: [String]) {
         array.append(value)
     }
 }
@@ -38,8 +38,8 @@ class ArrayWrapper: SetValueProtocol {
 */
 func checkAndSetArray<T: SetValueProtocol>(check: [Any], key: [String], out: inout T) throws {
     // allow empty arrays
-    if check.count == 0 {
-        out.setValue(key: key, value: check)
+    if check.isEmpty {
+        out.set(value: check, for: key)
         return
     }
 
@@ -47,37 +47,37 @@ func checkAndSetArray<T: SetValueProtocol>(check: [Any], key: [String], out: ino
     switch check[0] {
         case is Int:
             if let typedArray = check as? [Int] {
-                out.setValue(key: key, value: typedArray)
+                out.set(value: typedArray, for: key)
             } else {
                 throw TomlError.MixedArrayType("Int")
             }
         case is Double:
             if let typedArray = check as? [Double] {
-                out.setValue(key: key, value: typedArray)
+                out.set(value: typedArray, for: key)
             } else {
                 throw TomlError.MixedArrayType("Double")
             }
         case is String:
             if let typedArray = check as? [String] {
-                out.setValue(key: key, value: typedArray)
+                out.set(value: typedArray, for: key)
             } else {
                 throw TomlError.MixedArrayType("String")
             }
         case is Bool:
             if let typedArray = check as? [Bool] {
-                out.setValue(key: key, value: typedArray)
+                out.set(value: typedArray, for: key)
             } else {
                 throw TomlError.MixedArrayType("Bool")
             }
         case is Date:
             if let typedArray = check as? [Date] {
-                out.setValue(key: key, value: typedArray)
+                out.set(value: typedArray, for: key)
             } else {
                 throw TomlError.MixedArrayType("Date")
             }
         default:
             // array of arrays leave as any
-            out.setValue(key: key, value: check)
+            out.set(value: check, for: key)
     }
 }
 
@@ -110,7 +110,7 @@ func getKeyPathFromTable(tokens: [Token]) -> [String] {
 }
 
 func consumeTableIdentifierTokens(tableTokens: inout [Token], tokens: inout [Token]) {
-    while tokens.count > 0 {
+    while !tokens.isEmpty {
         let nestedToken = tokens[0]
         tableTokens.append(nestedToken)
         tokens.remove(at: 0)
@@ -168,7 +168,7 @@ func getTableTokens(keyPath: [String], tokens: inout [Token]) -> [Token] {
 
 func extractTableTokens(tokens: inout [Token], inline: Bool = false) -> [Token] {
     var tableTokens = [Token]()
-    while tokens.count > 0 {
+    while !tokens.isEmpty {
         let tableToken = tokens[0]
 
         if inline {

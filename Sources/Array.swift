@@ -15,12 +15,13 @@
  */
 
 extension Array where Element: Equatable {
+    
     func begins(with: [Element]) -> Bool {
         if with.count > self.count {
             return false
         }
 
-        for x in 0..<with.count {
+        for x in with.indices {
             if self[x] != with[x] {
                 return false
             }
@@ -28,9 +29,11 @@ extension Array where Element: Equatable {
 
         return true
     }
+    
 }
 
 extension Array: Equatable, Hashable {
+    
     public var hashValue: Int {
         return String(describing: self).hashValue
     }
@@ -38,4 +41,5 @@ extension Array: Equatable, Hashable {
     public static func == (lhs: Array<Element>, rhs: Array<Element>) -> Bool {
         return lhs.hashValue == rhs.hashValue
     }
+    
 }

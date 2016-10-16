@@ -41,8 +41,8 @@ class Lexer {
             // check content against evaluators to produce tokens
             for evaluator in grammar[stack.last!]! {
                 if let e = try evaluator.evaluate(content) {
-                    if e.token != nil {
-                        tokens.append(e.token!)
+                    if let t = e.token {
+                        tokens.append(t)
                     }
 
                     // should we pop the stack?
@@ -51,8 +51,8 @@ class Lexer {
                     }
 
                     // should we push onto the stack?
-                    if evaluator.push != nil {
-                        stack = stack + evaluator.push!
+                    if let pushItmes = evaluator.push {
+                        stack = stack + pushItmes
                     }
 
                     content = content.substring(from: e.index)
@@ -67,4 +67,5 @@ class Lexer {
         }
         return tokens
     }
+    
 }

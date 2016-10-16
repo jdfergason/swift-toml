@@ -62,7 +62,7 @@ class Parser {
         // Convert tokens to values in the Toml
         var myTokens = tokens
 
-        while myTokens.count > 0 {
+        while !myTokens.isEmpty {
             let token = myTokens.remove(at: 0)
             if case .Key(let val) = token {
                 currentKey = val
@@ -82,7 +82,7 @@ class Parser {
     private func parse(tokens: inout [Token]) throws -> [Any] {
         var array: [Any] = [Any]()
 
-        while tokens.count > 0 {
+        while !tokens.isEmpty {
             let token = tokens.remove(at: 0)
             switch token {
                 case .Identifier(let val):
@@ -130,7 +130,7 @@ class Parser {
             throw TomlError.DuplicateKey(String(describing: key))
         }
 
-        toml.setValue(key: key, value: currToken.value)
+        toml.set(value: currToken.value, for: key)
     }
 
     /**
@@ -146,7 +146,7 @@ class Parser {
         // clear out the keyPath
         keyPath.removeAll()
 
-        while tokens.count > 0 {
+        while !tokens.isEmpty {
             let subToken = tokens.remove(at: 0)
             if case .TableEnd = subToken {
                 if keyPath.count < 1 {
@@ -184,7 +184,7 @@ class Parser {
         // clear out the keyPath
         keyPath.removeAll()
 
-        tableLoop: while tokens.count > 0 {
+        tableLoop: while !tokens.isEmpty {
             let subToken = tokens.remove(at: 0)
             if case .TableArrayEnd = subToken {
                 if keyPath.count < 1 {
@@ -198,11 +198,11 @@ class Parser {
                     let tableParser = Parser()
                     try tableParser.parse(tokens: tableTokens)
                     arr.append(tableParser.toml)
-                    toml.setValue(key: keyPath, value: arr)
+                    toml.set(value: arr, for: keyPath)
                 } else {
                     let tableParser = Parser()
                     try tableParser.parse(tokens: tableTokens)
-                    toml.setValue(key: keyPath, value: [tableParser.toml])
+                    toml.set(value: [tableParser.toml], for: keyPath)
                 }
                 break tableLoop
             } else if case .Identifier(let val) = subToken {
@@ -243,8 +243,8 @@ class Parser {
         myKeyPath.append(currentKey)
 
         // allow empty arrays
-        if arr.count == 0 {
-            toml.setValue(key: myKeyPath, value: arr)
+        if arr.isEmpty {
+            toml.set(value: arr, for: myKeyPath)
             return
         }
 

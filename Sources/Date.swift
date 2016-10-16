@@ -39,6 +39,7 @@ private func localTimeOffset() -> String {
  }
 
 extension Date {
+    
     // rfc3339 w fractional seconds w/ time offset
     init?(rfc3339String: String, fractionalSeconds: Bool = true, localTime: Bool = false) {
         var dateStr = rfc3339String
@@ -47,12 +48,8 @@ extension Date {
         if localTime {
             dateStr += localTimeOffset()
         }
-
-        if fractionalSeconds {
-            dateFormatter = rfc3339fractionalformatter
-        } else {
-            dateFormatter = rfc3339formatter
-        }
+        
+        dateFormatter = fractionalSeconds ? rfc3339fractionalformatter : rfc3339formatter
 
         if let d = dateFormatter.date(from: dateStr) {
             self.init(timeInterval: 0, since: d)
@@ -64,4 +61,5 @@ extension Date {
     func rfc3339String() -> String {
         return rfc3339fractionalformatter.string(from: self)
     }
+    
 }
