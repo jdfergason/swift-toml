@@ -17,18 +17,20 @@
 import Foundation
 
 var expressions = [String: NSRegularExpression]()
+
 extension String {
     func match(_ regex: String, options: NSRegularExpression.Options = []) -> String? {
         let expression: NSRegularExpression
-        if let exists = expressions[regex] {
-            expression = exists
+        
+        if let cachedRegexp = expressions[regex] {
+            expression = cachedRegexp
         } else {
             expression = try! NSRegularExpression(pattern: "^\(regex)", options: options)
             expressions[regex] = expression
         }
-
+        
         let range = expression.rangeOfFirstMatch(in: self, options: [],
-            range: NSMakeRange(0, self.utf16.count))
+            range: NSMakeRange(0, self.characters.count))
         if range.location != NSNotFound {
             return (self as NSString).substring(with: range)
         }

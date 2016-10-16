@@ -36,7 +36,7 @@ public enum TomlError: Error {
 }
 
 protocol SetValueProtocol {
-    mutating func setValue(key: [String], value: Any)
+    mutating func set(value: Any, for key: [String])
 }
 
 /**
@@ -104,7 +104,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter key: Array of strings
         - Parameter value: Value to set
     */
-    public func setValue(key: [String], value: Any) {
+    public func set(value: Any, for key: [String]) {
         let path = String(describing: key)
         keyNames.insert(key)
         data[path] = value
@@ -364,7 +364,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             var keyArray = keyName
             if keyArray.begins(with: path) {
                 keyArray.removeSubrange(0..<path.count)
-                constructedTable.setValue(key: keyArray, value: self.value(keyName)!)
+                constructedTable.set(value: self.value(keyName)!, for: keyArray)
             }
         }
 
@@ -373,7 +373,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
             var tableArray = tableName
             if tableArray.begins(with: path) {
                 tableArray.removeSubrange(0..<path.count)
-                if tableArray.count != 0 {
+                if !tableArray.isEmpty {
                     constructedTable.setTable(key: tableArray)
                 }
             }

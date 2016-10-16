@@ -91,11 +91,11 @@ enum Token: Hashable {
             return nil
         }
     }
-
-}
-
-func == (lhs: Token, rhs: Token) -> Bool {
-    return lhs.hashValue == rhs.hashValue
+    
+    static func == (lhs: Token, rhs: Token) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
 }
 
 typealias TokenGenerator = (String) throws -> Token?
