@@ -17,7 +17,20 @@
 import XCTest
 @testable import Toml
 
+private func changeWorkingDirectoryToPackageRoot() {
+    let packageRootPath = URL(fileURLWithPath: #file)
+        .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().path
+
+    if !FileManager.default.changeCurrentDirectoryPath(packageRootPath) {
+        fatalError("Couldn't change working directory to \(packageRootPath)")
+    }
+}
+
 class TomlTests: XCTestCase {
+    override func setUp() {
+        changeWorkingDirectoryToPackageRoot()
+    }
+
     func testSimple() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/simple.toml")
         XCTAssertEqual(actual.string("string"), "value")
