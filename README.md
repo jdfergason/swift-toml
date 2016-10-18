@@ -85,9 +85,6 @@ To run the unit tests checkout the repository and type:
 
     swift test
 
-Note: this must be done from the root of the checkout because it depends on a variety of test data files
-that are referenced as a relative path.
-
 ## License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
