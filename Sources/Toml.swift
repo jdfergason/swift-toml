@@ -43,15 +43,15 @@ protocol SetValueProtocol {
     Data parsed from a TOML document
 */
 public class Toml: CustomStringConvertible, SetValueProtocol {
-    private var data: [String: Any]
-    private(set) public var keyNames: Set<[String]>
-    private(set) public var prefixPath: [String]?
-    private(set) public var tableNames: Set<[String]>
+    private var data: [Path: Any]
+    private(set) public var keyNames: Set<Path>
+    private(set) public var prefixPath: Path?
+    private(set) public var tableNames: Set<Path>
 
     public init() {
-        data = [String: Any]()
-        keyNames = Set<[String]>()
-        tableNames = Set<[String]>()
+        data = [Path: Any]()
+        keyNames = Set<Path>()
+        tableNames = Set<Path>()
     }
 
     /**
@@ -93,7 +93,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
 
         - Parameter prefixPath: The path to prefix all tables with
     */
-    private convenience init(prefixPath: [String]) {
+    private convenience init(prefixPath: Path) {
         self.init()
         self.prefixPath = prefixPath
     }
@@ -105,8 +105,8 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter value: Value to set
     */
     public func set(value: Any, for key: [String]) {
-        let path = String(describing: key)
-        keyNames.insert(key)
+        let path = Path(key)
+        keyNames.insert(path)
         data[path] = value
     }
 
@@ -116,7 +116,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Parameter key: Array of strings indicating table path
     */
     public func setTable(key: [String]) {
-        tableNames.insert(key)
+        tableNames.insert(Path(key))
     }
 
     /**
@@ -128,7 +128,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if key exists; false otherwise
     */
     public func hasKey(key: [String], includeTables: Bool = true) -> Bool {
-        var keyExists = data[String(describing: key)] != nil
+        var keyExists = data[Path(key)] != nil
         if includeTables {
             keyExists = keyExists || hasTable(key)
         }
@@ -154,8 +154,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: True if table exists; false otherwise
     */
     public func hasTable(_ key: [String]) -> Bool {
-        let tableNamesLookup = tableNames.map({ String(describing: $0) })
-        return tableNamesLookup.contains(String(describing: key))
+        return tableNames.contains(Path(key))
     }
 
     /**
@@ -177,7 +176,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: An array of type [T]
     */
     public func array<T>(_ path: [String]) -> [T]? {
-        if let val = data[String(describing: path)] {
+        if let val = data[Path(path)] {
             return val as? [T]
         }
 
@@ -322,10 +321,10 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
                 myTableName = tablePrefix + tableName
             }
 
-            tableParent.removeLast()
-            if parent == tableParent {
+            tableParent.components.removeLast()
+            if parent == tableParent.components {
                 // this is a table to include
-                result[myTableName.map(quoted).joined(separator: ".")] = table(from: tableName)
+                result[myTableName.components.map(quoted).joined(separator: ".")] = table(from: tableName.components)
             }
         }
         return result
@@ -352,26 +351,26 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: `Toml` table of all keys beneath the specified path
     */
     public func table(from path: [String]) -> Toml {
-        var fullTablePrefix = path
+        var fullTablePrefix = Path(path)
         if let tablePrefix = prefixPath {
-            fullTablePrefix = tablePrefix + path
+            fullTablePrefix = tablePrefix + Path(path)
         }
 
         let constructedTable = Toml(prefixPath: fullTablePrefix)
 
         // add values
         for keyName in keyNames {
-            var keyArray = keyName
-            if keyArray.begins(with: path) {
+            var keyArray = keyName.components
+            if keyName.begins(with: path) {
                 keyArray.removeSubrange(0..<path.count)
-                constructedTable.set(value: self.value(keyName)!, for: keyArray)
+                constructedTable.set(value: self.value(keyName.components)!, for: keyArray)
             }
         }
 
         // add tables
         for tableName in tableNames {
-            var tableArray = tableName
-            if tableArray.begins(with: path) {
+            var tableArray = tableName.components
+            if tableName.begins(with: path) {
                 tableArray.removeSubrange(0..<path.count)
                 if !tableArray.isEmpty {
                     constructedTable.setTable(key: tableArray)
@@ -401,7 +400,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: value of key path
     */
     public func value<T>(_ path: [String]) -> T? {
-        if let val = data[String(describing: path)] {
+        if let val = data[Path(path)] {
             return val as? T
         }
 
@@ -427,7 +426,7 @@ public class Toml: CustomStringConvertible, SetValueProtocol {
         - Returns: value of key path as a string
     */
     public func valueDescription(_ path: [String]) -> String? {
-        if let check = data[String(describing: path)] {
+        if let check = data[Path(path)] {
             if let intVal = check as? Int {
                 return String(describing: intVal)
             } else if let doubleVal = check as? Double {

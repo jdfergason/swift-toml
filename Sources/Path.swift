@@ -14,32 +14,39 @@
  * limitations under the License.
  */
 
-extension Array where Element: Equatable {
-    
-    func begins(with: [Element]) -> Bool {
-        if with.count > self.count {
+/**
+    Abstraction for TOML key paths
+*/
+public struct Path: Hashable, Equatable {
+    internal(set) public var components: [String]
+
+    init(_ components: [String]) {
+        self.components = components
+    }
+
+    func begins(with: [String]) -> Bool {
+        if with.count > components.count {
             return false
         }
 
         for x in with.indices {
-            if self[x] != with[x] {
+            if components[x] != with[x] {
                 return false
             }
         }
 
         return true
     }
-    
-}
 
-extension Array: Equatable, Hashable {
-    
     public var hashValue: Int {
-        return String(describing: self).hashValue
+        return components.reduce(0, { $0 ^ $1.hashValue })
     }
 
-    public static func == (lhs: Array<Element>, rhs: Array<Element>) -> Bool {
-        return lhs.hashValue == rhs.hashValue
+    public static func == (lhs: Path, rhs: Path) -> Bool {
+        return lhs.components == rhs.components
     }
-    
+
+    static func + (lhs: Path, rhs: Path) -> Path {
+        return Path(lhs.components + rhs.components)
+    }
 }
