@@ -130,7 +130,7 @@ class Parser {
             throw TomlError.DuplicateKey(String(describing: key))
         }
 
-        toml.set(value: currToken.value, for: key)
+        toml.set(value: currToken.value as Any, for: key)
     }
 
     /**
