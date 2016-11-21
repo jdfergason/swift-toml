@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
+- Move equatable == method to a static member to better conform with Swift3 conventions
+- SetValueProtocol method renamed from func setValue(key: , value: ) to 
+  func set(value:, for:)
+- Add support for running tests from XCode
 - Updated to Swift 3.0 GM
 - Updated examples in README.md to reflect current API
 
