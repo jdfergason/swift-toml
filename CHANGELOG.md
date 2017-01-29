@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add support for running tests from XCode
 - Updated to Swift 3.0 GM
 - Updated examples in README.md to reflect current API
+- Significant performance improvements
 
 ## [0.4.0] - 2016-08-24
 ### Added
