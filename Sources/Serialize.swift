@@ -19,8 +19,8 @@ import Foundation
 /**
     Get list of top level keys and optionally sort
 */
-private func filterKeys(keys: Set<[String]>) -> [String] {
-    var myKeys = keys.filter({ $0.count == 1}).map({ $0.last! })
+private func filterKeys(keys: Set<Path>) -> [String] {
+    var myKeys = keys.filter({ $0.components.count == 1}).map({ $0.components.first! })
     myKeys.sort()
     return myKeys
 }
@@ -59,7 +59,7 @@ private func serializeTable(toml: Toml) -> [String] {
         // get table title
         var titleParts = [tableName]
         if let prefixPath = toml.prefixPath {
-            titleParts = prefixPath + [tableName]
+            titleParts = prefixPath.components + [tableName]
         }
         let title = titleParts.map(quoted).joined(separator: ".")
 

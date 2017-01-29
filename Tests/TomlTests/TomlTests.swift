@@ -48,7 +48,7 @@ class TomlTests: XCTestCase {
         XCTAssertFalse(actual.hasTable("non-existant-table"))
         XCTAssertFalse(actual.hasKey("inline_table", "4"))
 
-        XCTAssertEqual(actual.array("array"), [1, 2, 3])
+        XCTAssertEqual(actual.array("array") ?? [], [1, 2, 3])
     }
 
     func testSerialize() {
@@ -231,7 +231,7 @@ class TomlTests: XCTestCase {
     func testCommentsEverywhere() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/comments-everywhere.toml")
         XCTAssertEqual(actual.int("group", "answer"), 42)
-        XCTAssertEqual(actual.array("group", "more"), [42, 42])
+        XCTAssertEqual(actual.array("group", "more") ?? [], [42, 42])
     }
 
     func testDatetime() {
@@ -247,7 +247,7 @@ class TomlTests: XCTestCase {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/example.toml")
         XCTAssertEqual(actual.date("best-day-ever"), Date(rfc3339String: "1987-07-05T17:45:00.0Z")!)
         XCTAssertFalse(actual.bool("numtheory", "boring")!)
-        XCTAssertEqual(actual.array("numtheory", "perfection"), [6, 28, 496])
+        XCTAssertEqual(actual.array("numtheory", "perfection") ?? [], [6, 28, 496])
     }
 
     func testFloat() {
