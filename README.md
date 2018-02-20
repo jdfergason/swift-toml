@@ -75,9 +75,9 @@ Add the project to  to your Package.swift file as a dependency:
 
 ## Compatibility
 
-SwiftToml is compatible with Swift 3.0 and TOML 0.4.0.
+SwiftToml is compatible with Swift 4.0.3 and TOML 0.4.0.
 
-It has been tested with Swift 3.0 GM Candidate on Mac OS X, Ubuntu 14.04, and Fedora 23.  Currently it only works with Mac OS X due to some features of Swift not currently working under linux.  I am actively working to fully support linux.
+It has been tested with Swift 4.0.3 on Mac OS X and Ubuntu 16.04. 
 
 ## Tests
 
