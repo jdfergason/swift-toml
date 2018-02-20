@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ## [1.0.0] - 2018-02-20
+### Added
+- Linux support
+
 ### Changed
 - Updated to Swift 4.0.3
-- Full support for Linux
 - Significant performance improvements
 - Move equatable == method to a static member to better conform with Swift3 conventions
 - SetValueProtocol method renamed from func setValue(key: , value: ) to 
