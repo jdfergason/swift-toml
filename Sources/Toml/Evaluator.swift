@@ -36,9 +36,9 @@ class Evaluator {
     }
 
     func evaluate (_ content: String) throws ->
-        (token: Token?, index: String.CharacterView.Index)? {
+        (token: Token?, index: String.Index)? {
         var token: Token?
-        var index: String.CharacterView.Index
+        var index: String.Index
 
         var options: NSRegularExpression.Options = []
 
@@ -48,7 +48,7 @@ class Evaluator {
 
         if let m = content.match(self.regex, options: options) {
             token = try self.generator(m)
-            index = content.index(content.startIndex, offsetBy: m.characters.count)
+            index = content.index(content.startIndex, offsetBy: m.count)
             return (token, index)
         }
 

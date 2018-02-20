@@ -78,7 +78,7 @@ extension String {
         let nss = (s as NSString)
 
         for match in matches {
-            let m0 = nss.substring(with: match.rangeAt(0))
+            let m0 = nss.substring(with: match.range(at: 0))
             s = s.replacingOccurrences(of: m0, with: "")
         }
 
@@ -91,7 +91,7 @@ extension String {
         var unicode = ""
         var unicodeSize = -1
 
-        for char in self.characters {
+        for char in self {
             if escape {
                 if unicodeSize == 0 {
                     s += try getUnicodeChar(unicode: unicode)

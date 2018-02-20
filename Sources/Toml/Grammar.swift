@@ -265,7 +265,7 @@ class Grammar {
             Evaluator(regex: "[a-zA-Z0-9_-]+[ \t]*=",
                 generator: {
                     (r: String) in
-                        .Key(r.substring(to: r.index(r.endIndex, offsetBy:-1)).trim())
+                        .Key(String(r[..<r.index(r.endIndex, offsetBy:-1)]).trim())
                 },
                 push: ["value"]),
             // string key

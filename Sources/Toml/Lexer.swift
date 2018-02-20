@@ -35,7 +35,7 @@ class Lexer {
 
         stack.append("root")
 
-        while content.characters.count > 0 {
+        while content.count > 0 {
             var matched = false
 
             // check content against evaluators to produce tokens
@@ -54,8 +54,8 @@ class Lexer {
                     if let pushItmes = evaluator.push {
                         stack = stack + pushItmes
                     }
-
-                    content = content.substring(from: e.index)
+                    
+                    content = String(content[e.index...])
                     matched = true
                     break
                 }
