@@ -53,7 +53,7 @@ class TomlTests: XCTestCase {
 
     func testSerialize() {
         let actual = try! Toml(contentsOfFile: "Tests/TomlTests/serialize.toml")
-        let expected = try! String(contentsOfFile: "Tests/TomlTests/expected-serialize.toml")
+        let expected = try! String(contentsOfFile: "Tests/TomlTests/expected-serialize.toml", encoding: .utf8)
         XCTAssertEqual(String(describing: actual), expected.trim())
     }
 
@@ -74,7 +74,7 @@ class TomlTests: XCTestCase {
         actualKeys.sort()
 
         XCTAssertEqual(String(describing: expectedKeys), String(describing: actualKeys))
-        let expectedTables = try! String(contentsOfFile: "Tests/TomlTests/expected-nested-tables.toml")
+        let expectedTables = try! String(contentsOfFile: "Tests/TomlTests/expected-nested-tables.toml", encoding: .utf8)
 
         XCTAssertEqual(expectedTables.trim(), String(describing: actual).trim())
     }

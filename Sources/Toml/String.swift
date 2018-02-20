@@ -75,7 +75,7 @@ extension String {
             options: [.dotMatchesLineSeparators])
         let matches = regex.matches(in: s, options: [],
             range: NSMakeRange(0, s.utf16.count))
-        let nss = (s as NSString)
+        let nss = NSString(string: s)
 
         for match in matches {
             let m0 = nss.substring(with: match.range(at: 0))

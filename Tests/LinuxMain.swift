@@ -1,5 +1,5 @@
 import XCTest
-@testable import TomlTestSuite
+@testable import TomlTests
 
 XCTMain([
      testCase(TomlTests.allTests),

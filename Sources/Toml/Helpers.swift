@@ -89,7 +89,7 @@ func trimStringIdentifier(_ input: String, _ quote: String = "\"") -> String {
     let regex = try! NSRegularExpression(pattern: pattern, options: [])
     let matches = regex.matches(in: input, options: [],
         range: NSMakeRange(0, input.utf16.count))
-    let nss = (input as NSString)
+    let nss = NSString(string: input)
     return nss.substring(with: matches[0].range(at: 1))
 }
 
