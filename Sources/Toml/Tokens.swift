@@ -34,7 +34,11 @@ enum Token: Hashable {
     case TableEnd
     case Comment(String)
 
-    var hashValue: Int {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(caseHashValue)
+    }
+
+    private var caseHashValue: Int {
         switch self {
         case .Identifier:
             return 0
