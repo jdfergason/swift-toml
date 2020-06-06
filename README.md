@@ -22,48 +22,54 @@ Both functions return a Toml object of parsed key/value pairs
 
 ## Parse TOML from file on disk
 
-    import Toml
-    let toml = try Toml(contentsOfFile: "/path/to/file.toml")
+```swift
+import Toml
+let toml = try Toml(contentsOfFile: "/path/to/file.toml")
+```
 
 ## Parse TOML from string
 
-    import Toml
-    let toml = try Toml(withString: "answer = 42")
+```swift
+import Toml
+let toml = try Toml(withString: "answer = 42")
+```
 
 ## Get raw values from TOML document
 
-    import Toml
-    let toml = try Toml(contentsOfFile: "/path/to/file.toml")
+```swift
+import Toml
+let toml = try Toml(contentsOfFile: "/path/to/file.toml")
 
-    // string value
-    print(toml.string("table1", "name"))
+// string value
+print(toml.string("table1", "name"))
 
-    // boolean value
-    print(toml.bool("table1", "manager"))
+// boolean value
+print(toml.bool("table1", "manager"))
 
-    // integer value
-    print(toml.int("table1", "age"))
+// integer value
+print(toml.int("table1", "age"))
 
-    // double value
-    print(toml.double("table1", "rating"))
+// double value
+print(toml.double("table1", "rating"))
 
-    // date value
-    print(toml.date("table1", "birthday"))
+// date value
+print(toml.date("table1", "birthday"))
 
-    // get value and resolve type at runtime
-    print(try toml.value("title")!)
+// get value and resolve type at runtime
+print(try toml.value("title")!)
 
-    // get array of type [String]
-    let array: [String] = toml.array("locations")!
+// get array of type [String]
+let array: [String] = toml.array("locations")!
 
-    // get table
-    let table1 = toml.table("table1")
+// get table
+let table1 = toml.table("table1")
 
-    // iterate over all tables at the root level
-    for (tablePath, table) in toml.tables() { ... }
+// iterate over all tables at the root level
+for (tablePath, table) in toml.tables() { ... }
 
-    // iterate over all tables under table1
-    for (tablePath, table) in toml.tables("table1") { ... }
+// iterate over all tables under table1
+for (tablePath, table) in toml.tables("table1") { ... }
+```
 
 ## Installation
 
